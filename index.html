@@ -1,0 +1,1778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon AI Adventure</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Poppins:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 25%, #45B7D1 50%, #96CEB4 75%, #FECA57 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Pokemon elements */
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-pokeball {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle at 30% 30%, #ff4444, #cc0000);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-pokeball::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            border: 2px solid #333;
+        }
+
+        .floating-pokeball:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+        .floating-pokeball:nth-child(2) { top: 20%; right: 15%; animation-delay: 2s; }
+        .floating-pokeball:nth-child(3) { bottom: 30%; left: 20%; animation-delay: 4s; }
+        .floating-pokeball:nth-child(4) { bottom: 15%; right: 10%; animation-delay: 6s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(90deg); }
+            50% { transform: translateY(-10px) rotate(180deg); }
+            75% { transform: translateY(-15px) rotate(270deg); }
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            max-width: 1400px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 {
+            text-align: center;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+            font-size: 3em;
+            font-family: 'Fredoka One', cursive;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: titleBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes titleBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .dataset-selector {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(78, 205, 196, 0.1));
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .dataset-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            border: 3px solid transparent;
+            background-clip: padding-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dataset-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4);
+            border-radius: 15px;
+            z-index: -1;
+            margin: -3px;
+        }
+
+        .dataset-section h4 {
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+
+        .dataset-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .dataset-btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: linear-gradient(135deg, #e0e0e0, #f5f5f5);
+            color: #666;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .dataset-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255,255,255,0.7), transparent);
+            transition: all 0.4s ease;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+        }
+
+        .dataset-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .dataset-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .dataset-btn.active {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+            color: white;
+            transform: scale(1.1);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .dataset-btn.combined {
+            background: linear-gradient(135deg, #4ECDC4, #45B7D1);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .dataset-btn.combined::after {
+            content: '✨';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(45deg, #FECA57, #FF9F43);
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            animation: sparkle 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); }
+            50% { box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6); }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+        }
+
+        .combine-controls {
+            display: flex;
+            gap: 20px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .combine-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            background: linear-gradient(135deg, #9C27B0, #E91E63);
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 6px 20px rgba(156, 39, 176, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .combine-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .combine-btn:hover::before {
+            left: 100%;
+        }
+
+        .combine-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(156, 39, 176, 0.4);
+        }
+
+        .clear-btn {
+            background: linear-gradient(135deg, #FF5722, #FF7043);
+            box-shadow: 0 6px 20px rgba(255, 87, 34, 0.3);
+        }
+
+        .combined-summary {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(139, 195, 74, 0.1));
+            border: 3px solid #4CAF50;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(76, 175, 80, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(76, 175, 80, 0.6); }
+        }
+
+        .combined-summary h5 {
+            color: #2E7D32;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        .combined-breakdown {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            font-size: 14px;
+        }
+
+        .breakdown-item {
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .breakdown-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .data-stats {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            min-width: 140px;
+            border: 2px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #FF6B6B, #4ECDC4, #45B7D1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px) scale(1.05);
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .training-info {
+            background: linear-gradient(135deg, rgba(233, 30, 99, 0.1), rgba(156, 39, 176, 0.1));
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: center;
+            border-left: 5px solid #E91E63;
+            position: relative;
+        }
+
+        .training-info::before {
+            content: '🎯';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 24px;
+            background: white;
+            padding: 5px;
+            border-radius: 50%;
+        }
+
+        .training-info h4 {
+            color: #AD1457;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+
+        .importance-grid {
+            display: grid;
+            grid-template-columns: 140px repeat(6, 120px);
+            grid-template-rows: auto repeat(4, 100px);
+            gap: 15px;
+            margin: 40px auto;
+            width: fit-content;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3));
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .grid-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #333;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            font-size: 13px;
+            word-break: break-word;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+
+        .type-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            padding: 15px;
+            border-radius: 15px;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .type-label:hover {
+            transform: scale(1.05);
+        }
+
+        .type-label.fire { 
+            background: linear-gradient(135deg, #ff6b6b, #ff5252);
+        }
+        .type-label.water { 
+            background: linear-gradient(135deg, #4ecdc4, #26c6da);
+        }
+        .type-label.grass { 
+            background: linear-gradient(135deg, #8bc34a, #66bb6a);
+        }
+        .type-label.dragon { 
+            background: linear-gradient(135deg, #7c4dff, #b388ff);
+        }
+
+        .importance-cell {
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            border-radius: 15px;
+            padding: 15px;
+            position: relative;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #444;
+            transition: transform 0.3s ease;
+        }
+
+        .importance-cell:hover {
+            transform: scale(1.05);
+        }
+
+        .led-display {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            justify-content: center;
+        }
+
+        .led {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #333;
+            border: 2px solid #555;
+            transition: all 0.4s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .led.red-on {
+            background: radial-gradient(circle at 30% 30%, #ff6666, #ff4444);
+            box-shadow: 0 0 15px #ff4444, inset 0 2px 4px rgba(255,255,255,0.2);
+            border-color: #ff6666;
+            animation: ledPulse 1s ease-in-out infinite;
+        }
+
+        .led.green-on {
+            background: radial-gradient(circle at 30% 30%, #66ff66, #44ff44);
+            box-shadow: 0 0 15px #44ff44, inset 0 2px 4px rgba(255,255,255,0.2);
+            border-color: #66ff66;
+            animation: ledPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes ledPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .importance-value {
+            color: #fff;
+            font-weight: 700;
+            font-size: 13px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .training-controls {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .train-btn {
+            padding: 18px 40px;
+            margin: 10px;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .train-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255,255,255,0.3), transparent);
+            transition: all 0.4s ease;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+        }
+
+        .train-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .train-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(76, 175, 80, 0.5);
+        }
+
+        .train-btn:disabled {
+            background: linear-gradient(135deg, #ccc, #aaa);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .test-btn {
+            background: linear-gradient(135deg, #ff9800, #ffb74d);
+            box-shadow: 0 8px 25px rgba(255, 152, 0, 0.4);
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            box-shadow: 0 8px 25px rgba(244, 67, 54, 0.4);
+        }
+
+        .epoch-counter {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 25px 0;
+            animation: counterGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes counterGlow {
+            0%, 100% { text-shadow: 0 0 10px rgba(33, 150, 243, 0.3); }
+            50% { text-shadow: 0 0 20px rgba(33, 150, 243, 0.6); }
+        }
+
+        .pokemon-queue {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .pokemon-queue h4 {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+
+        .pokemon-training-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            padding: 18px;
+            text-align: center;
+            transition: all 0.4s ease;
+            cursor: default;
+            min-width: 130px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .pokemon-training-card.active {
+            border-color: #4caf50;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(76, 175, 80, 0.1));
+            transform: scale(1.1);
+            animation: activeCard 1s ease-in-out infinite;
+        }
+
+        @keyframes activeCard {
+            0%, 100% { box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3); }
+            50% { box-shadow: 0 10px 30px rgba(76, 175, 80, 0.5); }
+        }
+
+        .pokemon-training-card.trained {
+            opacity: 0.6;
+            border-color: #bdbdbd;
+            transform: scale(0.95);
+        }
+
+        .training-status {
+            text-align: center;
+            margin: 25px 0;
+            font-size: 20px;
+            color: #555;
+            font-weight: 600;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.6));
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+        }
+
+        .test-section {
+            background: linear-gradient(135deg, rgba(63, 81, 181, 0.1), rgba(100, 181, 246, 0.1));
+            border-radius: 20px;
+            padding: 30px;
+            margin: 40px 0;
+            border: 2px solid rgba(63, 81, 181, 0.3);
+        }
+
+        .test-section h3 {
+            text-align: center;
+            background: linear-gradient(45deg, #1976D2, #42A5F5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .test-pokemon-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .test-pokemon-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(5px);
+        }
+
+        .test-pokemon-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .test-pokemon-card.selected {
+            border-color: #ff9800;
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.2), rgba(255, 152, 0, 0.1));
+            transform: scale(1.05);
+        }
+
+        .prediction-result {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px auto;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+
+        .prediction-scores {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .score-item {
+            padding: 15px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f5f5f5, #eeeeee);
+            transition: transform 0.3s ease;
+        }
+
+        .score-item:hover {
+            transform: scale(1.05);
+        }
+
+        .score-item.highest {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(76, 175, 80, 0.1));
+            border: 3px solid #4caf50;
+            animation: winner 1s ease-in-out infinite;
+        }
+
+        @keyframes winner {
+            0%, 100% { box-shadow: 0 0 15px rgba(76, 175, 80, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(76, 175, 80, 0.6); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .importance-grid {
+                grid-template-columns: 100px repeat(6, 80px);
+                grid-template-rows: auto repeat(4, 80px);
+                gap: 8px;
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements">
+        <div class="floating-pokeball"></div>
+        <div class="floating-pokeball"></div>
+        <div class="floating-pokeball"></div>
+        <div class="floating-pokeball"></div>
+    </div>
+
+    <div class="game-container">
+        <h1>🎮 Pokémon AI Adventure</h1>
+        
+        <div class="dataset-selector">
+            <div class="dataset-section">
+                <h4>🎯 Step 1: Select Multiple Datasets to Combine</h4>
+                <div class="dataset-buttons">
+                    <button class="dataset-btn" onclick="toggleDatasetForCombining(1, this)">1. Fire Only (20)</button>
+                    <button class="dataset-btn" onclick="toggleDatasetForCombining(2, this)">2. Water Only (20)</button>
+                    <button class="dataset-btn" onclick="toggleDatasetForCombining(3, this)">3. Grass Only (20)</button>
+                    <button class="dataset-btn" onclick="toggleDatasetForCombining(4, this)">4. Dragon Only (20)</button>
+                    <button class="dataset-btn" onclick="toggleDatasetForCombining(5, this)">5. Balanced Mix (15 each)</button>
+                    <button class="dataset-btn" onclick="toggleDatasetForCombining(6, this)">6. Biased Mix (5 each)</button>
+                </div>
+                
+                <div class="combine-controls">
+                    <button class="combine-btn" onclick="createCombinedDataset()">🔗 Combine Selected Datasets</button>
+                    <button class="combine-btn clear-btn" onclick="clearCombination()">🗑️ Clear All</button>
+                    <span style="color: #666; font-size: 14px;">Select one or more datasets above</span>
+                </div>
+                
+                <div class="combined-summary" id="combined-summary" style="display: none;">
+                    <h5>📋 Combined Training Dataset</h5>
+                    <div class="combined-breakdown" id="combined-breakdown">
+                        <!-- Breakdown will be shown here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="data-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="total-training">0</div>
+                <div class="stat-label">Training Pokemon</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="fire-count">0</div>
+                <div class="stat-label">Fire Types</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="water-count">0</div>
+                <div class="stat-label">Water Types</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="grass-count">0</div>
+                <div class="stat-label">Grass Types</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="dragon-count">0</div>
+                <div class="stat-label">Dragon Types</div>
+            </div>
+        </div>
+
+        <h3 style="text-align: center; font-family: 'Fredoka One', cursive; background: linear-gradient(45deg, #FF6B6B, #4ECDC4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 1.8em; margin: 30px 0;">Multi-Class Feature Importance LED Grid</h3>
+        <div class="importance-grid" id="importance-grid">
+            <!-- Grid will be dynamically generated -->
+        </div>
+
+        <div class="training-controls">
+            <button class="train-btn" id="start-train-btn" onclick="startTraining()">🚀 Run One Epoch</button>
+            <button class="train-btn reset-btn" onclick="resetWeights()">🔄 Reset Model Weights</button>
+            
+            <div class="epoch-counter">
+                Epoch: <span id="epoch-count">0</span>
+            </div>
+        </div>
+
+        <div class="training-status" id="training-status">
+            Select and combine datasets to begin training your Pokemon AI model.
+        </div>
+
+        <div class="pokemon-queue" id="pokemon-queue">
+            <!-- Training queue will be shown here -->
+        </div>
+
+        <div class="test-section">
+            <h3>💯 Test Model on 100 Pokémon</h3>
+            <div class="training-controls" style="margin: 20px 0;">
+                <button class="train-btn test-btn" id="test-large-dataset-btn" onclick="testOnLargeDataset()">📊 Calculate Accuracy</button>
+            </div>
+            <div id="large-test-result" style="text-align: center; margin: 0; font-size: 20px; font-weight: 700;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Test Individual Pokemon</h3>
+            <p style="text-align: center; margin-bottom: 20px; font-weight: 600;">Select a Pokemon to test the model's prediction:</p>
+            <div class="test-pokemon-selector" id="test-pokemon-selector">
+                <!-- Test Pokemon will be shown here -->
+            </div>
+            
+            <div class="prediction-result" id="prediction-result" style="display: none;">
+                <!-- Prediction results will be shown here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let selectedDatasetsForCombining = new Set();
+        let combinedDataset = [];
+        let learningRate = 0.5; // Fixed to maximum
+        let trainingSpeed = 50; // Fixed to fastest
+        let epoch = 0;
+        let isTraining = false;
+        let currentTrainingItemIndex = 0;
+        let currentTrainingQueue = [];
+        
+        const typeEmojis = {
+            'fire': '🔥',
+            'water': '💧',
+            'grass': '🍃',
+            'dragon': '🐲'
+        };
+        
+        const featureIcons = {
+            'HasWings': '🦅',
+            'Speed': '👟',
+            'Attack': '⚔️',
+            'Defense': '🛡️',
+            'HabitatAltitude': '🏔️',
+            'HabitatTemperature': '🌡️'
+        };
+        
+        // Multi-type weights for 4 types and 6 features
+        let multiTypeWeights = {
+            fire: { HasWings: 0, Speed: 0, Attack: 0, Defense: 0, HabitatAltitude: 0, HabitatTemperature: 0 },
+            water: { HasWings: 0, Speed: 0, Attack: 0, Defense: 0, HabitatAltitude: 0, HabitatTemperature: 0 },
+            grass: { HasWings: 0, Speed: 0, Attack: 0, Defense: 0, HabitatAltitude: 0, HabitatTemperature: 0 },
+            dragon: { HasWings: 0, Speed: 0, Attack: 0, Defense: 0, HabitatAltitude: 0, HabitatTemperature: 0 }
+        };
+        
+        // Complete Pokemon dataset
+        const allPokemon = [
+            // FIRE POKEMON (35 total)
+            {name: "Charizard", HasWings: 1, Speed: 8, Attack: 9, Defense: 1, HabitatAltitude: 5, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Arcanine", HasWings: 0, Speed: 9, Attack: 8, Defense: 3, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Moltres", HasWings: 1, Speed: 7, Attack: 9, Defense: 2, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Typhlosion", HasWings: 0, Speed: 6, Attack: 8, Defense: 3, HabitatAltitude: 5, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Blaziken", HasWings: 0, Speed: 8, Attack: 9, Defense: 2, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Infernape", HasWings: 0, Speed: 9, Attack: 8, Defense: 3, HabitatAltitude: 6, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Houndoom", HasWings: 0, Speed: 7, Attack: 9, Defense: 2, HabitatAltitude: 5, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Magmortar", HasWings: 0, Speed: 5, Attack: 9, Defense: 3, HabitatAltitude: 3, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Rapidash", HasWings: 0, Speed: 7, Attack: 8, Defense: 3, HabitatAltitude: 5, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Flareon", HasWings: 0, Speed: 6, Attack: 9, Defense: 2, HabitatAltitude: 4, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Camerupt", HasWings: 0, Speed: 4, Attack: 8, Defense: 3, HabitatAltitude: 6, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Torkoal", HasWings: 0, Speed: 7, Attack: 7, Defense: 1, HabitatAltitude: 7, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Magcargo", HasWings: 0, Speed: 3, Attack: 8, Defense: 3, HabitatAltitude: 3, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Entei", HasWings: 0, Speed: 8, Attack: 9, Defense: 3, HabitatAltitude: 6, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Ho-Oh", HasWings: 1, Speed: 9, Attack: 9, Defense: 1, HabitatAltitude: 1, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Charmander", HasWings: 0, Speed: 6, Attack: 9, Defense: 1, HabitatAltitude: 3, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Charmeleon", HasWings: 0, Speed: 7, Attack: 6, Defense: 1, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Ponyta", HasWings: 0, Speed: 9, Attack: 8, Defense: 1, HabitatAltitude: 5, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Magmar", HasWings: 0, Speed: 3, Attack: 9, Defense: 1, HabitatAltitude: 7, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Vulpix", HasWings: 0, Speed: 6, Attack: 9, Defense: 2, HabitatAltitude: 4, HabitatTemperature: 7, CorrectType: "fire"},
+            {name: "Ninetales", HasWings: 0, Speed: 9, Attack: 7, Defense: 1, HabitatAltitude: 6, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Growlithe", HasWings: 0, Speed: 6, Attack: 7, Defense: 2, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Slugma", HasWings: 0, Speed: 8, Attack: 9, Defense: 2, HabitatAltitude: 8, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Numel", HasWings: 0, Speed: 3, Attack: 6, Defense: 2, HabitatAltitude: 7, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Torchic", HasWings: 0, Speed: 4, Attack: 6, Defense: 2, HabitatAltitude: 3, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Combusken", HasWings: 0, Speed: 5, Attack: 8, Defense: 1, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Chimchar", HasWings: 0, Speed: 6, Attack: 5, Defense: 3, HabitatAltitude: 5, HabitatTemperature: 7, CorrectType: "fire"},
+            {name: "Monferno", HasWings: 0, Speed: 8, Attack: 7, Defense: 3, HabitatAltitude: 6, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Litwick", HasWings: 0, Speed: 8, Attack: 9, Defense: 3, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Lampent", HasWings: 0, Speed: 5, Attack: 6, Defense: 1, HabitatAltitude: 5, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Chandelure", HasWings: 0, Speed: 8, Attack: 9, Defense: 1, HabitatAltitude: 6, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Heatran", HasWings: 0, Speed: 7, Attack: 9, Defense: 2, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Victini", HasWings: 1, Speed: 9, Attack: 9, Defense: 1, HabitatAltitude: 7, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Tepig", HasWings: 0, Speed: 4, Attack: 6, Defense: 3, HabitatAltitude: 3, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Pignite", HasWings: 0, Speed: 5, Attack: 9, Defense: 1, HabitatAltitude: 4, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "ColdFlame", HasWings: 0, Speed: 3, Attack: 6, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "fire"},
+            {name: "FrostBurn", HasWings: 1, Speed: 5, Attack: 5, Defense: 7, HabitatAltitude: 8, HabitatTemperature: 3, CorrectType: "fire"},
+            {name: "IceEmber", HasWings: 0, Speed: 4, Attack: 7, Defense: 6, HabitatAltitude: 1, HabitatTemperature: 5, CorrectType: "fire"},
+            {name: "ChillBlaze", HasWings: 1, Speed: 6, Attack: 8, Defense: 5, HabitatAltitude: 1, HabitatTemperature: 4, CorrectType: "fire"},
+            {name: "CoolFire", HasWings: 0, Speed: 7, Attack: 4, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 6, CorrectType: "fire"},
+
+            // WATER POKEMON (35 total)
+            {name: "Blastoise", HasWings: 0, Speed: 1, Attack: 3, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Lapras", HasWings: 0, Speed: 4, Attack: 3, Defense: 2, HabitatAltitude: 1, HabitatTemperature: 2, CorrectType: "water"},
+            {name: "Vaporeon", HasWings: 0, Speed: 1, Attack: 2, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Gyarados", HasWings: 0, Speed: 5, Attack: 4, Defense: 3, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Golduck", HasWings: 0, Speed: 7, Attack: 3, Defense: 7, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Tentacruel", HasWings: 0, Speed: 6, Attack: 2, Defense: 5, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Slowbro", HasWings: 0, Speed: 2, Attack: 3, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Cloyster", HasWings: 0, Speed: 7, Attack: 3, Defense: 7, HabitatAltitude: 1, HabitatTemperature: 2, CorrectType: "water"},
+            {name: "Starmie", HasWings: 0, Speed: 1, Attack: 2, Defense: 2, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Seaking", HasWings: 0, Speed: 6, Attack: 3, Defense: 3, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Dewgong", HasWings: 0, Speed: 5, Attack: 2, Defense: 9, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
+            {name: "Kingler", HasWings: 0, Speed: 1, Attack: 4, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Politoed", HasWings: 0, Speed: 5, Attack: 3, Defense: 1, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Azumarill", HasWings: 0, Speed: 4, Attack: 2, Defense: 1, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Quagsire", HasWings: 0, Speed: 3, Attack: 3, Defense: 2, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Squirtle", HasWings: 0, Speed: 4, Attack: 4, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Wartortle", HasWings: 0, Speed: 3, Attack: 6, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Psyduck", HasWings: 0, Speed: 5, Attack: 5, Defense: 6, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Poliwag", HasWings: 0, Speed: 3, Attack: 5, Defense: 7, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Poliwhirl", HasWings: 0, Speed: 1, Attack: 6, Defense: 6, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Tentacool", HasWings: 0, Speed: 2, Attack: 4, Defense: 3, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Slowpoke", HasWings: 0, Speed: 1, Attack: 6, Defense: 2, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Seel", HasWings: 0, Speed: 4, Attack: 4, Defense: 4, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
+            {name: "Shellder", HasWings: 0, Speed: 4, Attack: 6, Defense: 6, HabitatAltitude: 1, HabitatTemperature: 2, CorrectType: "water"},
+            {name: "Krabby", HasWings: 0, Speed: 5, Attack: 1, Defense: 6, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Horsea", HasWings: 0, Speed: 3, Attack: 4, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Seadra", HasWings: 0, Speed: 2, Attack: 6, Defense: 8, HabitatAltitude: 3, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Staryu", HasWings: 0, Speed: 2, Attack: 4, Defense: 5, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Magikarp", HasWings: 0, Speed: 3, Attack: 1, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Totodile", HasWings: 0, Speed: 4, Attack: 6, Defense: 6, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Croconaw", HasWings: 0, Speed: 5, Attack: 1, Defense: 6, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Feraligatr", HasWings: 0, Speed: 3, Attack: 1, Defense: 6, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Mudkip", HasWings: 0, Speed: 4, Attack: 7, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Marshtomp", HasWings: 0, Speed: 5, Attack: 1, Defense: 6, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Swampert", HasWings: 0, Speed: 6, Attack: 1, Defense: 2, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "HotStream", HasWings: 1, Speed: 8, Attack: 8, Defense: 3, HabitatAltitude: 7, HabitatTemperature: 8, CorrectType: "water"},
+            {name: "BoilingWave", HasWings: 0, Speed: 2, Attack: 7, Defense: 2, HabitatAltitude: 8, HabitatTemperature: 9, CorrectType: "water"},
+            {name: "SteamRush", HasWings: 1, Speed: 7, Attack: 9, Defense: 4, HabitatAltitude: 6, HabitatTemperature: 7, CorrectType: "water"},
+            {name: "ThermalTide", HasWings: 0, Speed: 8, Attack: 6, Defense: 5, HabitatAltitude: 9, HabitatTemperature: 8, CorrectType: "water"},
+            {name: "WarmWater", HasWings: 1, Speed: 6, Attack: 8, Defense: 3, HabitatAltitude: 5, HabitatTemperature: 7, CorrectType: "water"},
+            
+            // GRASS POKEMON (35 total)
+            {name: "Venusaur", HasWings: 0, Speed: 2, Attack: 3, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Vileplume", HasWings: 0, Speed: 4, Attack: 2, Defense: 7, HabitatAltitude: 5, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Exeggutor", HasWings: 0, Speed: 4, Attack: 2, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 2, CorrectType: "grass"},
+            {name: "Tangela", HasWings: 0, Speed: 5, Attack: 2, Defense: 9, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Meganium", HasWings: 0, Speed: 5, Attack: 3, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 2, CorrectType: "grass"},
+            {name: "Bellossom", HasWings: 0, Speed: 5, Attack: 2, Defense: 7, HabitatAltitude: 5, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Jumpluff", HasWings: 0, Speed: 2, Attack: 2, Defense: 7, HabitatAltitude: 1, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Sunflora", HasWings: 0, Speed: 3, Attack: 3, Defense: 6, HabitatAltitude: 4, HabitatTemperature: 2, CorrectType: "grass"},
+            {name: "Sceptile", HasWings: 0, Speed: 3, Attack: 3, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Shiftry", HasWings: 0, Speed: 2, Attack: 4, Defense: 6, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Tropius", HasWings: 1, Speed: 5, Attack: 3, Defense: 8, HabitatAltitude: 6, HabitatTemperature: 2, CorrectType: "grass"},
+            {name: "Cradily", HasWings: 0, Speed: 3, Attack: 3, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Ludicolo", HasWings: 0, Speed: 6, Attack: 2, Defense: 7, HabitatAltitude: 4, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Breloom", HasWings: 0, Speed: 2, Attack: 4, Defense: 6, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Roserade", HasWings: 0, Speed: 1, Attack: 2, Defense: 8, HabitatAltitude: 5, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Bulbasaur", HasWings: 0, Speed: 4, Attack: 4, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Ivysaur", HasWings: 0, Speed: 2, Attack: 6, Defense: 6, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Oddish", HasWings: 0, Speed: 3, Attack: 5, Defense: 9, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Gloom", HasWings: 0, Speed: 4, Attack: 6, Defense: 7, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Paras", HasWings: 0, Speed: 2, Attack: 1, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Parasect", HasWings: 0, Speed: 3, Attack: 1, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Bellsprout", HasWings: 0, Speed: 4, Attack: 1, Defense: 9, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Weepinbell", HasWings: 0, Speed: 5, Attack: 1, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Victreebel", HasWings: 0, Speed: 1, Attack: 1, Defense: 6, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Chikorita", HasWings: 0, Speed: 4, Attack: 4, Defense: 6, HabitatAltitude: 3, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Bayleef", HasWings: 0, Speed: 1, Attack: 6, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Hoppip", HasWings: 0, Speed: 5, Attack: 3, Defense: 4, HabitatAltitude: 7, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Skiploom", HasWings: 0, Speed: 1, Attack: 4, Defense: 5, HabitatAltitude: 1, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Sunkern", HasWings: 0, Speed: 3, Attack: 3, Defense: 9, HabitatAltitude: 4, HabitatTemperature: 2, CorrectType: "grass"},
+            {name: "Treecko", HasWings: 0, Speed: 1, Attack: 4, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Grovyle", HasWings: 0, Speed: 2, Attack: 6, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Seedot", HasWings: 0, Speed: 3, Attack: 4, Defense: 5, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Nuzleaf", HasWings: 0, Speed: 6, Attack: 1, Defense: 9, HabitatAltitude: 6, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Lileep", HasWings: 0, Speed: 2, Attack: 4, Defense: 7, HabitatAltitude: 3, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Turtwig", HasWings: 0, Speed: 3, Attack: 6, Defense: 6, HabitatAltitude: 4, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "DesertBloom", HasWings: 1, Speed: 8, Attack: 7, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "grass"},
+            {name: "SeaweedVine", HasWings: 0, Speed: 7, Attack: 6, Defense: 5, HabitatAltitude: 1, HabitatTemperature: 8, CorrectType: "grass"},
+            {name: "HotPlant", HasWings: 1, Speed: 6, Attack: 8, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 8, CorrectType: "grass"},
+            {name: "LowGrass", HasWings: 0, Speed: 1, Attack: 5, Defense: 6, HabitatAltitude: 1, HabitatTemperature: 7, CorrectType: "grass"},
+            {name: "WarmLeaf", HasWings: 1, Speed: 5, Attack: 9, Defense: 9, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "grass"},
+            
+            // DRAGON POKEMON (35 total)
+            {name: "Dragonite", HasWings: 1, Speed: 8, Attack: 9, Defense: 9, HabitatAltitude: 8, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Garchomp", HasWings: 0, Speed: 9, Attack: 9, Defense: 8, HabitatAltitude: 7, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Salamence", HasWings: 1, Speed: 9, Attack: 9, Defense: 7, HabitatAltitude: 9, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Rayquaza", HasWings: 1, Speed: 9, Attack: 9, Defense: 8, HabitatAltitude: 9, HabitatTemperature: 2, CorrectType: "dragon"},
+            {name: "Kingdra", HasWings: 1, Speed: 7, Attack: 8, Defense: 8, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Altaria", HasWings: 1, Speed: 6, Attack: 6, Defense: 8, HabitatAltitude: 9, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Flygon", HasWings: 1, Speed: 8, Attack: 8, Defense: 7, HabitatAltitude: 7, HabitatTemperature: 2, CorrectType: "dragon"},
+            {name: "Latias", HasWings: 1, Speed: 9, Attack: 7, Defense: 9, HabitatAltitude: 9, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Latios", HasWings: 1, Speed: 9, Attack: 8, Defense: 8, HabitatAltitude: 9, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Dialga", HasWings: 0, Speed: 7, Attack: 9, Defense: 9, HabitatAltitude: 8, HabitatTemperature: 1, CorrectType: "dragon"},
+            {name: "Palkia", HasWings: 1, Speed: 8, Attack: 9, Defense: 8, HabitatAltitude: 9, HabitatTemperature: 2, CorrectType: "dragon"},
+            {name: "Giratina", HasWings: 1, Speed: 7, Attack: 8, Defense: 9, HabitatAltitude: 9, HabitatTemperature: 1, CorrectType: "dragon"},
+            {name: "Haxorus", HasWings: 0, Speed: 8, Attack: 9, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Hydreigon", HasWings: 1, Speed: 8, Attack: 9, Defense: 7, HabitatAltitude: 7, HabitatTemperature: 2, CorrectType: "dragon"},
+            {name: "Reshiram", HasWings: 1, Speed: 8, Attack: 9, Defense: 9, HabitatAltitude: 9, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Dratini", HasWings: 0, Speed: 5, Attack: 6, Defense: 4, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Dragonair", HasWings: 0, Speed: 7, Attack: 8, Defense: 6, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Bagon", HasWings: 1, Speed: 5, Attack: 7, Defense: 6, HabitatAltitude: 6, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Shelgon", HasWings: 1, Speed: 5, Attack: 9, Defense: 9, HabitatAltitude: 7, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Vibrava", HasWings: 1, Speed: 7, Attack: 7, Defense: 5, HabitatAltitude: 6, HabitatTemperature: 2, CorrectType: "dragon"},
+            {name: "Swablu", HasWings: 1, Speed: 5, Attack: 4, Defense: 6, HabitatAltitude: 8, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Gible", HasWings: 1, Speed: 4, Attack: 7, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 2, CorrectType: "dragon"},
+            {name: "Gabite", HasWings: 1, Speed: 8, Attack: 9, Defense: 6, HabitatAltitude: 6, HabitatTemperature: 2, CorrectType: "dragon"},
+            {name: "Axew", HasWings: 1, Speed: 5, Attack: 8, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Fraxure", HasWings: 0, Speed: 6, Attack: 9, Defense: 9, HabitatAltitude: 6, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Deino", HasWings: 1, Speed: 9, Attack: 6, Defense: 5, HabitatAltitude: 5, HabitatTemperature: 2, CorrectType: "dragon"},
+            {name: "Zweilous", HasWings: 1, Speed: 5, Attack: 8, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 2, CorrectType: "dragon"},
+            {name: "Zekrom", HasWings: 1, Speed: 9, Attack: 9, Defense: 9, HabitatAltitude: 9, HabitatTemperature: 2, CorrectType: "dragon"},
+            {name: "Kyurem", HasWings: 1, Speed: 9, Attack: 9, Defense: 9, HabitatAltitude: 9, HabitatTemperature: 1, CorrectType: "dragon"},
+            {name: "Druddigon", HasWings: 1, Speed: 4, Attack: 9, Defense: 9, HabitatAltitude: 7, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Goomy", HasWings: 1, Speed: 4, Attack: 5, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Sliggoo", HasWings: 1, Speed: 6, Attack: 7, Defense: 5, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Goodra", HasWings: 1, Speed: 8, Attack: 9, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Noibat", HasWings: 1, Speed: 5, Attack: 3, Defense: 9, HabitatAltitude: 8, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Noivern", HasWings: 1, Speed: 9, Attack: 7, Defense: 8, HabitatAltitude: 9, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "WeakDragon", HasWings: 0, Speed: 3, Attack: 4, Defense: 5, HabitatAltitude: 2, HabitatTemperature: 8, CorrectType: "dragon"},
+            {name: "SlowWyrm", HasWings: 0, Speed: 4, Attack: 5, Defense: 6, HabitatAltitude: 3, HabitatTemperature: 9, CorrectType: "dragon"},
+            {name: "LowDrake", HasWings: 1, Speed: 5, Attack: 6, Defense: 4, HabitatAltitude: 1, HabitatTemperature: 7, CorrectType: "dragon"},
+            {name: "HotDragon", HasWings: 0, Speed: 6, Attack: 7, Defense: 5, HabitatAltitude: 4, HabitatTemperature: 9, CorrectType: "dragon"},
+            {name: "GroundDragon", HasWings: 0, Speed: 2, Attack: 8, Defense: 7, HabitatAltitude: 1, HabitatTemperature: 6, CorrectType: "dragon"},
+        ];
+        
+        // Test Pokemon dataset (15 Pokemon)
+        const testPokemon = [
+            {name: "Ninetales", HasWings: 0, Speed: 7, Attack: 9, Defense: 6, HabitatAltitude: 3, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Milotic", HasWings: 0, Speed: 6, Attack: 2, Defense: 7, HabitatAltitude: 3, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Leafeon", HasWings: 0, Speed: 7, Attack: 3, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Rayquaza", HasWings: 1, Speed: 10, Attack: 7, Defense: 7, HabitatAltitude: 8, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Growlithe", HasWings: 0, Speed: 7, Attack: 7, Defense: 2, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Psyduck", HasWings: 0, Speed: 6, Attack: 3, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
+            {name: "Petilil", HasWings: 0, Speed: 8, Attack: 2, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Dialga", HasWings: 1, Speed: 6, Attack: 8, Defense: 9, HabitatAltitude: 4, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Charizard", HasWings: 0, Speed: 10, Attack: 8, Defense: 2, HabitatAltitude: 8, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Gyaradous", HasWings: 1, Speed: 4, Attack: 3, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
+            {name: "Deerling", HasWings: 0, Speed: 2, Attack: 3, Defense: 10, HabitatAltitude: 3, HabitatTemperature: 2, CorrectType: "grass"},
+            {name: "Dragonite", HasWings: 1, Speed: 8, Attack: 8, Defense: 9, HabitatAltitude: 7, HabitatTemperature: 2, CorrectType: "dragon"},
+            {name: "Ponyta", HasWings: 0, Speed: 6, Attack: 8, Defense: 3, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Slowpoke", HasWings: 0, Speed: 7, Attack: 2, Defense: 7, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Bayleef", HasWings: 0, Speed: 9, Attack: 1, Defense: 7, HabitatAltitude: 7, HabitatTemperature: 4, CorrectType: "grass"}
+        ];
+
+        // *** NEW DATASET FOR TESTING ***
+        const newFireWaterGrassDragonDataset = [
+            // FIRE POKEMON (25 total)
+            {name: "Cinderace", HasWings: 0, Speed: 10, Attack: 9, Defense: 3, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Incineroar", HasWings: 0, Speed: 5, Attack: 9, Defense: 7, HabitatAltitude: 3, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Volcarona", HasWings: 1, Speed: 8, Attack: 9, Defense: 6, HabitatAltitude: 7, HabitatTemperature: 10, CorrectType: "fire"},
+            {name: "Salazzle", HasWings: 0, Speed: 9, Attack: 8, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Talonflame", HasWings: 1, Speed: 10, Attack: 8, Defense: 3, HabitatAltitude: 9, HabitatTemperature: 7, CorrectType: "fire"},
+            {name: "Turtonator", HasWings: 0, Speed: 3, Attack: 7, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Centiskorch", HasWings: 0, Speed: 6, Attack: 9, Defense: 5, HabitatAltitude: 2, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Coalossal", HasWings: 0, Speed: 3, Attack: 8, Defense: 9, HabitatAltitude: 2, HabitatTemperature: 10, CorrectType: "fire"},
+            {name: "Armarouge", HasWings: 0, Speed: 7, Attack: 9, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Ceruledge", HasWings: 0, Speed: 8, Attack: 10, Defense: 7, HabitatAltitude: 3, HabitatTemperature: 7, CorrectType: "fire"},
+            {name: "Darmanitan", HasWings: 0, Speed: 8, Attack: 10, Defense: 4, HabitatAltitude: 5, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Pyroar", HasWings: 0, Speed: 9, Attack: 8, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Heatmor", HasWings: 0, Speed: 6, Attack: 8, Defense: 5, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Fennekin", HasWings: 0, Speed: 6, Attack: 5, Defense: 3, HabitatAltitude: 3, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Braixen", HasWings: 0, Speed: 7, Attack: 7, Defense: 4, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Delphox", HasWings: 0, Speed: 8, Attack: 9, Defense: 6, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Litten", HasWings: 0, Speed: 7, Attack: 6, Defense: 3, HabitatAltitude: 3, HabitatTemperature: 7, CorrectType: "fire"},
+            {name: "Torracat", HasWings: 0, Speed: 8, Attack: 8, Defense: 4, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Scorbunny", HasWings: 0, Speed: 7, Attack: 7, Defense: 3, HabitatAltitude: 4, HabitatTemperature: 7, CorrectType: "fire"},
+            {name: "Raboot", HasWings: 0, Speed: 9, Attack: 8, Defense: 4, HabitatAltitude: 4, HabitatTemperature: 7, CorrectType: "fire"},
+            {name: "Cyndaquil", HasWings: 0, Speed: 6, Attack: 6, Defense: 3, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Quilava", HasWings: 0, Speed: 8, Attack: 7, Defense: 4, HabitatAltitude: 5, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Ogerpon (Hearthflame)", HasWings: 0, Speed: 9, Attack: 9, Defense: 7, HabitatAltitude: 5, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Magby", HasWings: 0, Speed: 8, Attack: 7, Defense: 2, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Darumaka", HasWings: 0, Speed: 5, Attack: 8, Defense: 3, HabitatAltitude: 4, HabitatTemperature: 9, CorrectType: "fire"},
+
+            // WATER POKEMON (25 total)
+            {name: "Greninja", HasWings: 0, Speed: 10, Attack: 8, Defense: 3, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Primarina", HasWings: 0, Speed: 5, Attack: 9, Defense: 7, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Inteleon", HasWings: 0, Speed: 10, Attack: 8, Defense: 3, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Samurott", HasWings: 0, Speed: 6, Attack: 8, Defense: 7, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Empoleon", HasWings: 0, Speed: 5, Attack: 7, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
+            {name: "Milotic", HasWings: 0, Speed: 7, Attack: 7, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Swampert", HasWings: 0, Speed: 5, Attack: 9, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Golisopod", HasWings: 0, Speed: 4, Attack: 9, Defense: 9, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Toxapex", HasWings: 0, Speed: 3, Attack: 5, Defense: 10, HabitatAltitude: 1, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Drednaw", HasWings: 0, Speed: 6, Attack: 9, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 5, CorrectType: "water"},
+            {name: "Barraskewda", HasWings: 0, Speed: 10, Attack: 9, Defense: 2, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Kyogre", HasWings: 0, Speed: 8, Attack: 9, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 2, CorrectType: "water"},
+            {name: "Suicune", HasWings: 0, Speed: 7, Attack: 7, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 2, CorrectType: "water"},
+            {name: "Piplup", HasWings: 0, Speed: 4, Attack: 5, Defense: 4, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
+            {name: "Prinplup", HasWings: 0, Speed: 5, Attack: 6, Defense: 6, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
+            {name: "Froakie", HasWings: 0, Speed: 7, Attack: 5, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Frogadier", HasWings: 0, Speed: 9, Attack: 6, Defense: 4, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Sobble", HasWings: 0, Speed: 7, Attack: 4, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Drizzile", HasWings: 0, Speed: 8, Attack: 6, Defense: 4, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Popplio", HasWings: 0, Speed: 4, Attack: 6, Defense: 4, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Brionne", HasWings: 0, Speed: 5, Attack: 8, Defense: 6, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Oshawott", HasWings: 0, Speed: 4, Attack: 5, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Dewott", HasWings: 0, Speed: 5, Attack: 7, Defense: 5, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Wailord", HasWings: 0, Speed: 5, Attack: 8, Defense: 4, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Sharpedo", HasWings: 0, Speed: 8, Attack: 9, Defense: 3, HabitatAltitude: 1, HabitatTemperature: 5, CorrectType: "water"},
+
+            // GRASS POKEMON (25 total)
+            {name: "Rillaboom", HasWings: 0, Speed: 7, Attack: 9, Defense: 8, HabitatAltitude: 5, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Decidueye", HasWings: 1, Speed: 6, Attack: 8, Defense: 7, HabitatAltitude: 8, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Serperior", HasWings: 0, Speed: 9, Attack: 7, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Chesnaught", HasWings: 0, Speed: 5, Attack: 8, Defense: 9, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Leafeon", HasWings: 0, Speed: 8, Attack: 8, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Ferrothorn", HasWings: 0, Speed: 2, Attack: 8, Defense: 10, HabitatAltitude: 3, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Tsareena", HasWings: 0, Speed: 6, Attack: 9, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 6, CorrectType: "grass"},
+            {name: "Appletun", HasWings: 0, Speed: 3, Attack: 7, Defense: 7, HabitatAltitude: 3, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Flapple", HasWings: 1, Speed: 6, Attack: 8, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Amoonguss", HasWings: 0, Speed: 3, Attack: 7, Defense: 6, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Lurantis", HasWings: 0, Speed: 4, Attack: 8, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 6, CorrectType: "grass"},
+            {name: "Celebi", HasWings: 1, Speed: 8, Attack: 8, Defense: 8, HabitatAltitude: 7, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Virizion", HasWings: 0, Speed: 9, Attack: 8, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Rowlet", HasWings: 1, Speed: 4, Attack: 5, Defense: 4, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Dartrix", HasWings: 1, Speed: 5, Attack: 7, Defense: 6, HabitatAltitude: 7, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Snivy", HasWings: 0, Speed: 6, Attack: 4, Defense: 5, HabitatAltitude: 3, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Servine", HasWings: 0, Speed: 8, Attack: 6, Defense: 7, HabitatAltitude: 4, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Grookey", HasWings: 0, Speed: 6, Attack: 6, Defense: 4, HabitatAltitude: 5, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Thwackey", HasWings: 0, Speed: 7, Attack: 8, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Chespin", HasWings: 0, Speed: 4, Attack: 6, Defense: 6, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Quilladin", HasWings: 0, Speed: 5, Attack: 7, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Gogoat", HasWings: 0, Speed: 6, Attack: 8, Defense: 5, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Sceptile", HasWings: 0, Speed: 10, Attack: 8, Defense: 5, HabitatAltitude: 6, HabitatTemperature: 6, CorrectType: "grass"},
+            {name: "Torterra", HasWings: 0, Speed: 5, Attack: 8, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Meowscarada", HasWings: 0, Speed: 10, Attack: 9, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 5, CorrectType: "grass"},
+
+            // DRAGON POKEMON (25 total)
+            {name: "Dragapult", HasWings: 0, Speed: 10, Attack: 9, Defense: 6, HabitatAltitude: 8, HabitatTemperature: 5, CorrectType: "dragon"},
+            {name: "Kommo-o", HasWings: 0, Speed: 7, Attack: 8, Defense: 9, HabitatAltitude: 6, HabitatTemperature: 6, CorrectType: "dragon"},
+            {name: "Duraludon", HasWings: 0, Speed: 7, Attack: 8, Defense: 9, HabitatAltitude: 7, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Appletun", HasWings: 0, Speed: 3, Attack: 7, Defense: 7, HabitatAltitude: 3, HabitatTemperature: 5, CorrectType: "dragon"},
+            {name: "Flapple", HasWings: 1, Speed: 6, Attack: 8, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 5, CorrectType: "dragon"},
+            {name: "Dracovish", HasWings: 0, Speed: 6, Attack: 8, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Dracozolt", HasWings: 0, Speed: 7, Attack: 8, Defense: 8, HabitatAltitude: 5, HabitatTemperature: 6, CorrectType: "dragon"},
+            {name: "Eternatus", HasWings: 1, Speed: 9, Attack: 9, Defense: 8, HabitatAltitude: 10, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Regidrago", HasWings: 0, Speed: 7, Attack: 8, Defense: 4, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Baxcalibur", HasWings: 0, Speed: 7, Attack: 10, Defense: 8, HabitatAltitude: 7, HabitatTemperature: 1, CorrectType: "dragon"},
+            {name: "Tyrantrum", HasWings: 0, Speed: 6, Attack: 9, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 7, CorrectType: "dragon"},
+            {name: "Naganadel", HasWings: 1, Speed: 10, Attack: 9, Defense: 6, HabitatAltitude: 9, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Guzzlord", HasWings: 0, Speed: 4, Attack: 8, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 5, CorrectType: "dragon"},
+            {name: "Jangmo-o", HasWings: 0, Speed: 4, Attack: 5, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 6, CorrectType: "dragon"},
+            {name: "Hakamo-o", HasWings: 0, Speed: 6, Attack: 7, Defense: 8, HabitatAltitude: 6, HabitatTemperature: 6, CorrectType: "dragon"},
+            {name: "Dreepy", HasWings: 0, Speed: 8, Attack: 6, Defense: 3, HabitatAltitude: 7, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Drakloak", HasWings: 0, Speed: 9, Attack: 8, Defense: 5, HabitatAltitude: 7, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Applin", HasWings: 0, Speed: 2, Attack: 4, Defense: 7, HabitatAltitude: 4, HabitatTemperature: 5, CorrectType: "dragon"},
+            {name: "Gible", HasWings: 0, Speed: 4, Attack: 7, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 7, CorrectType: "dragon"},
+            {name: "Gabite", HasWings: 0, Speed: 8, Attack: 8, Defense: 6, HabitatAltitude: 4, HabitatTemperature: 6, CorrectType: "dragon"},
+            {name: "Axew", HasWings: 0, Speed: 5, Attack: 8, Defense: 5, HabitatAltitude: 3, HabitatTemperature: 5, CorrectType: "dragon"},
+            {name: "Fraxure", HasWings: 0, Speed: 6, Attack: 9, Defense: 6, HabitatAltitude: 4, HabitatTemperature: 5, CorrectType: "dragon"},
+            {name: "Goomy", HasWings: 0, Speed: 4, Attack: 5, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Sliggoo", HasWings: 0, Speed: 6, Attack: 7, Defense: 5, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Noibat", HasWings: 1, Speed: 5, Attack: 3, Defense: 3, HabitatAltitude: 8, HabitatTemperature: 3, CorrectType: "dragon"},
+        ];
+        
+        // Predefined datasets
+        const datasets = {
+            1: allPokemon.filter(p => p.CorrectType === 'fire').slice(0, 20),
+            2: allPokemon.filter(p => p.CorrectType === 'water').slice(0, 20),
+            3: allPokemon.filter(p => p.CorrectType === 'grass').slice(0, 20),
+            4: allPokemon.filter(p => p.CorrectType === 'dragon').slice(0, 20),
+            5: [
+                ...allPokemon.filter(p => p.CorrectType === 'fire').slice(20, 35),
+                ...allPokemon.filter(p => p.CorrectType === 'water').slice(20, 35),
+                ...allPokemon.filter(p => p.CorrectType === 'grass').slice(20, 35),
+                ...allPokemon.filter(p => p.CorrectType === 'dragon').slice(20, 35)
+            ],
+            6: [
+                ...allPokemon.filter(p => p.CorrectType === 'fire').slice(35, 40),
+                ...allPokemon.filter(p => p.CorrectType === 'water').slice(35, 40),
+                ...allPokemon.filter(p => p.CorrectType === 'grass').slice(35, 40),
+                ...allPokemon.filter(p => p.CorrectType === 'dragon').slice(35, 40)
+            ]
+        };
+        
+        // LED Display Functions
+        function updateLEDDisplay(weight, cellId) {
+            const cell = document.getElementById(cellId);
+            if (!cell) return;
+            
+            const ledDisplay = cell.querySelector('.led-display');
+            const leds = ledDisplay.querySelectorAll('.led');
+            const valueDisplay = cell.querySelector('.importance-value');
+            
+            // Reset all LEDs
+            leds.forEach(led => {
+                led.classList.remove('red-on', 'green-on');
+            });
+            
+            // Update value display
+            valueDisplay.textContent = weight.toFixed(2);
+            
+            // Calculate number of LEDs to light based on weight
+            const absWeight = Math.abs(weight);
+            let numLEDs = 0;
+            
+            if (absWeight > 0.15) numLEDs = 1;
+            if (absWeight >= 0.5) numLEDs = 2;
+            if (absWeight >= 0.8) numLEDs = 3;
+            
+            // Light up LEDs based on sign and magnitude
+            if (weight < 0) {
+                // Negative weight = red LEDs
+                for (let i = 0; i < numLEDs; i++) {
+                    leds[i].classList.add('red-on');
+                }
+            } else if (weight > 0) {
+                // Positive weight = green LEDs
+                for (let i = 0; i < numLEDs; i++) {
+                    leds[i].classList.add('green-on');
+                }
+            }
+            // If weight is 0 or very close to 0, no LEDs are lit
+        }
+        
+        // Enhanced Functions for Combined Datasets
+        function toggleDatasetForCombining(datasetNumber, buttonElement) {
+            if (selectedDatasetsForCombining.has(datasetNumber)) {
+                selectedDatasetsForCombining.delete(datasetNumber);
+                buttonElement.classList.remove('combined');
+            } else {
+                selectedDatasetsForCombining.add(datasetNumber);
+                buttonElement.classList.add('combined');
+            }
+            
+            // Update UI to show selection state
+            updateCombineButtonText();
+        }
+        
+        function updateCombineButtonText() {
+            const combineBtn = document.querySelector('.combine-btn');
+            const selectedCount = selectedDatasetsForCombining.size;
+            
+            if (selectedCount === 0) {
+                combineBtn.textContent = '🔗 Combine Selected Datasets';
+                combineBtn.disabled = true;
+                combineBtn.style.opacity = '0.5';
+            } else {
+                combineBtn.textContent = `🔗 Combine ${selectedCount} Dataset${selectedCount > 1 ? 's' : ''}`;
+                combineBtn.disabled = false;
+                combineBtn.style.opacity = '1';
+            }
+        }
+        
+        function createCombinedDataset() {
+            if (selectedDatasetsForCombining.size === 0) {
+                alert('Please select at least one dataset first!');
+                return;
+            }
+            
+            // Clear previous combination
+            combinedDataset = [];
+            
+            // Combine selected datasets
+            const datasetNames = {
+                1: 'Fire Only',
+                2: 'Water Only', 
+                3: 'Grass Only',
+                4: 'Dragon Only',
+                5: 'Balanced Mix',
+                6: 'Biased Mix'
+            };
+            
+            let combinedNames = [];
+            selectedDatasetsForCombining.forEach(datasetNum => {
+                const dataset = datasets[datasetNum];
+                dataset.forEach(pokemon => {
+                    // Add source information to pokemon
+                    const pokemonWithSource = {
+                        ...pokemon,
+                        sourceDataset: datasetNum,
+                        sourceName: datasetNames[datasetNum]
+                    };
+                    combinedDataset.push(pokemonWithSource);
+                });
+                combinedNames.push(datasetNames[datasetNum]);
+            });
+            
+            // Remove duplicates based on pokemon name
+            const uniquePokemon = [];
+            const seenNames = new Set();
+            combinedDataset.forEach(pokemon => {
+                if (!seenNames.has(pokemon.name)) {
+                    seenNames.add(pokemon.name);
+                    uniquePokemon.push(pokemon);
+                }
+            });
+            combinedDataset = uniquePokemon;
+            
+            // Update UI
+            updateCombinedSummary();
+            updateStats();
+            resetWeights();
+            
+            // Show success message
+            document.getElementById('training-status').textContent = 
+                `Ready to train! Click "Run One Epoch" to start. Current epoch: ${epoch}`;
+            
+            // Clear training queue display
+            document.getElementById('pokemon-queue').innerHTML = 
+                `<h4>🎯 Ready to Start Training (will be Epoch ${epoch + 1})</h4>`;
+        }
+        
+        function updateCombinedSummary() {
+            const summaryDiv = document.getElementById('combined-summary');
+            const breakdownDiv = document.getElementById('combined-breakdown');
+            
+            if (combinedDataset.length === 0) {
+                summaryDiv.style.display = 'none';
+                return;
+            }
+            
+            summaryDiv.style.display = 'block';
+            
+            // Count by type
+            const typeCounts = {
+                fire: 0,
+                water: 0,
+                grass: 0,
+                dragon: 0
+            };
+            
+            combinedDataset.forEach(pokemon => {
+                typeCounts[pokemon.CorrectType]++;
+            });
+            
+            // Create breakdown
+            breakdownDiv.innerHTML = `
+                <div class="breakdown-item">Total: ${combinedDataset.length}</div>
+                <div class="breakdown-item">🔥 Fire: ${typeCounts.fire}</div>
+                <div class="breakdown-item">💧 Water: ${typeCounts.water}</div>
+                <div class="breakdown-item">🌿 Grass: ${typeCounts.grass}</div>
+                <div class="breakdown-item">🐉 Dragon: ${typeCounts.dragon}</div>
+            `;
+        }
+        
+        function clearCombination() {
+            selectedDatasetsForCombining.clear();
+            combinedDataset = [];
+            
+            // Reset all dataset buttons
+            document.querySelectorAll('.dataset-btn').forEach(btn => {
+                btn.classList.remove('combined');
+            });
+            
+            // Update UI
+            updateCombineButtonText();
+            updateCombinedSummary();
+            updateStats();
+            resetWeights();
+            
+            document.getElementById('training-status').textContent = 
+                'Select and combine datasets to begin training your Pokemon AI model.';
+        }
+        
+        function updateStats() {
+            const trainingPokemon = getTrainingPokemon();
+            const counts = {
+                fire: 0,
+                water: 0,
+                grass: 0,
+                dragon: 0
+            };
+            
+            trainingPokemon.forEach(p => {
+                counts[p.CorrectType]++;
+            });
+            
+            document.getElementById('total-training').textContent = trainingPokemon.length;
+            document.getElementById('fire-count').textContent = counts.fire;
+            document.getElementById('water-count').textContent = counts.water;
+            document.getElementById('grass-count').textContent = counts.grass;
+            document.getElementById('dragon-count').textContent = counts.dragon;
+        }
+        
+        function getTrainingPokemon() {
+            return combinedDataset; // Use all Pokemon from combined dataset
+        }
+        
+        function initializeImportanceGrid() {
+            const grid = document.getElementById('importance-grid');
+            grid.innerHTML = '';
+            
+            // Header row
+            grid.appendChild(createGridCell('', 'grid-header'));
+            const features = ['HasWings', 'Speed', 'Attack', 'Defense', 'HabitatAltitude', 'HabitatTemperature'];
+            features.forEach(feature => {
+                const cell = createGridCell(`${featureIcons[feature]}<br>${feature}`, 'grid-header');
+                grid.appendChild(cell);
+            });
+            
+            // Type rows
+            ['fire', 'water', 'grass', 'dragon'].forEach(type => {
+                const typeLabels = {
+                    'fire': '🔥 Fire',
+                    'water': '💧 Water',
+                    'grass': '🍃 Grass',
+                    'dragon': '🐲 Dragon'
+                };
+                
+                grid.appendChild(createGridCell(typeLabels[type], `type-label ${type}`));
+                
+                features.forEach(feature => {
+                    const importanceCell = document.createElement('div');
+                    importanceCell.className = 'importance-cell';
+                    importanceCell.id = `importance-${type}-${feature}`;
+                    importanceCell.innerHTML = `
+                        <div class="led-display">
+                            <div class="led"></div>
+                            <div class="led"></div>
+                            <div class="led"></div>
+                        </div>
+                        <div class="importance-value">0.00</div>
+                    `;
+                    grid.appendChild(importanceCell);
+                });
+            });
+        }
+        
+        function createGridCell(content, className) {
+            const cell = document.createElement('div');
+            cell.className = className;
+            cell.innerHTML = content;
+            return cell;
+        }
+        
+        function updateMultiTypeDisplay() {
+            const features = ['HasWings', 'Speed', 'Attack', 'Defense', 'HabitatAltitude', 'HabitatTemperature'];
+            ['fire', 'water', 'grass', 'dragon'].forEach(type => {
+                features.forEach(feature => {
+                    const cellId = `importance-${type}-${feature}`;
+                    const weight = multiTypeWeights[type][feature];
+                    updateLEDDisplay(weight, cellId);
+                });
+            });
+        }
+        
+        function resetWeights() {
+            pauseTraining();
+            epoch = 0;
+            document.getElementById('epoch-count').textContent = epoch;
+            
+            // Reset all weights to 0
+            Object.keys(multiTypeWeights).forEach(type => {
+                Object.keys(multiTypeWeights[type]).forEach(feature => {
+                    multiTypeWeights[type][feature] = 0;
+                });
+            });
+            
+            updateMultiTypeDisplay();
+            document.getElementById('prediction-result').style.display = 'none';
+        }
+        
+        function startTraining() {
+            const trainingPokemon = getTrainingPokemon();
+            if (trainingPokemon.length === 0) {
+                alert('Please combine datasets first to start training!');
+                return;
+            }
+            
+            // Run exactly one epoch
+            runOneEpoch(trainingPokemon);
+        }
+        
+        function runOneEpoch(trainingPokemon) {
+            currentTrainingQueue = shuffleArray([...trainingPokemon]);
+            currentTrainingItemIndex = 0;
+            isTraining = true;
+            
+            // Show training status
+            document.getElementById('training-status').textContent = `Running Epoch ${epoch + 1}...`;
+            displayTrainingQueue();
+            
+            // Disable start button during training
+            document.getElementById('start-train-btn').disabled = true;
+            document.getElementById('start-train-btn').style.opacity = '0.5';
+            
+            // Train all items in the epoch quickly
+            trainEpochItems();
+        }
+        
+        function trainEpochItems() {
+            if (currentTrainingItemIndex < currentTrainingQueue.length) {
+                const pokemon = currentTrainingQueue[currentTrainingItemIndex];
+                
+                // Update UI to show current training
+                document.getElementById('training-status').textContent = 
+                    `Epoch ${epoch + 1}: Learning from ${pokemon.name} (${pokemon.CorrectType}) - ${currentTrainingItemIndex + 1}/${currentTrainingQueue.length}`;
+                
+                // Train on this pokemon
+                trainMultiTypeLogic(pokemon);
+                displayTrainingQueue();
+                currentTrainingItemIndex++;
+                
+                // Continue with next item after short delay for visual feedback
+                setTimeout(trainEpochItems, 30); // Fast training speed
+            } else {
+                // Epoch complete
+                epoch++;
+                document.getElementById('epoch-count').textContent = epoch;
+                isTraining = false;
+                
+                // Re-enable start button
+                document.getElementById('start-train-btn').disabled = false;
+                document.getElementById('start-train-btn').style.opacity = '1';
+                
+                // Update status
+                document.getElementById('training-status').textContent = 
+                    `Epoch ${epoch} completed! Click "Run One Epoch" to run another epoch.`;
+                
+                // Clear training queue display
+                document.getElementById('pokemon-queue').innerHTML = 
+                    `<h4>🎯 Ready for Next Epoch (will be Epoch ${epoch + 1})</h4>`;
+            }
+        }
+        
+        function pauseTraining() {
+            // Remove pause functionality since we now run single epochs
+            // This function is kept for compatibility but does nothing
+        }
+        
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+        
+        function displayTrainingQueue() {
+            const queueDiv = document.getElementById('pokemon-queue');
+            queueDiv.innerHTML = '<h4>🎯 Training Queue (Epoch ' + (epoch + 1) + ')</h4>';
+            
+            currentTrainingQueue.forEach((pokemon, index) => {
+                const card = document.createElement('div');
+                card.className = 'pokemon-training-card';
+                if (index === currentTrainingItemIndex && isTraining) {
+                    card.classList.add('active');
+                }
+                if (index < currentTrainingItemIndex) {
+                    card.classList.add('trained');
+                }
+                
+                card.innerHTML = `
+                    <div>${typeEmojis[pokemon.CorrectType]}</div>
+                    <div>${pokemon.name}</div>
+                    <div style="font-size: 11px; color: #555;">${pokemon.CorrectType.toUpperCase()}</div>
+                    <div style="font-size: 10px; color: #999;">Dataset ${pokemon.sourceDataset}</div>
+                `;
+                
+                queueDiv.appendChild(card);
+            });
+        }
+        
+        function trainMultiTypeLogic(pokemon) {
+            const features = {
+                HasWings: pokemon.HasWings, // Keep 0/1 as is
+                Speed: (pokemon.Speed - 4.5) / 4.5,  // Maps 0→-1, 4.5→0, 9→1
+                Attack: (pokemon.Attack - 4.5) / 4.5,
+                Defense: (pokemon.Defense - 4.5) / 4.5,
+                HabitatAltitude: (pokemon.HabitatAltitude - 4.5) / 4.5,
+                HabitatTemperature: (pokemon.HabitatTemperature - 4.5) / 4.5
+            };
+            
+            ['fire', 'water', 'grass', 'dragon'].forEach(type => {
+                let rawScore = 0;
+                Object.keys(features).forEach(f => {
+                    rawScore += multiTypeWeights[type][f] * features[f];
+                });
+                
+                const prediction = 1 / (1 + Math.exp(-rawScore));
+                const target = pokemon.CorrectType === type ? 1 : 0;
+                const error = target - prediction;
+                const gradient = error * prediction * (1 - prediction);
+                
+                Object.keys(features).forEach(f => {
+                    multiTypeWeights[type][f] += learningRate * gradient * features[f];
+                    // Clip weights to [-1, 1]
+                    multiTypeWeights[type][f] = Math.max(-1, Math.min(1, multiTypeWeights[type][f]));
+                });
+            });
+            
+            updateMultiTypeDisplay();
+        }
+        
+        function initializeTestSection() {
+            const container = document.getElementById('test-pokemon-selector');
+            container.innerHTML = '';
+            
+            testPokemon.forEach(pokemon => {
+                const card = document.createElement('div');
+                card.className = 'test-pokemon-card';
+                card.innerHTML = `
+                    <div class="type-emoji">${typeEmojis[pokemon.CorrectType]}</div>
+                    <div><strong>${pokemon.name}</strong></div>
+                    <div style="font-size: 11px; color: #666;">${pokemon.CorrectType.toUpperCase()}</div>
+                    <button style="margin-top: 15px; padding: 8px 20px; border: none; border-radius: 20px; background: linear-gradient(45deg, #ff9800, #ffb74d); color: white; cursor: pointer; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s ease;" onclick="testSinglePokemon('${pokemon.name}')" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">Test</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        function testSinglePokemon(pokemonName) {
+            const pokemon = testPokemon.find(p => p.name === pokemonName);
+            if (!pokemon) return;
+            
+            const predictions = predictMultiTypeScores(pokemon);
+            const predictedType = Object.keys(predictions).reduce((a, b) => 
+                predictions[a] > predictions[b] ? a : b);
+            const isCorrect = predictedType === pokemon.CorrectType;
+            
+            const resultDiv = document.getElementById('prediction-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <h3 style="background: linear-gradient(45deg, #FF6B6B, #4ECDC4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 20px;">${pokemon.name} - Test Result</h3>
+                <div style="margin: 25px 0;">
+                    <p style="font-size: 18px; margin: 10px 0;"><strong>Actual Type:</strong> ${typeEmojis[pokemon.CorrectType]} ${pokemon.CorrectType.toUpperCase()}</p>
+                    <p style="font-size: 18px; margin: 10px 0;"><strong>Predicted Type:</strong> ${typeEmojis[predictedType]} ${predictedType.toUpperCase()}</p>
+                    <p style="font-size: 28px; font-weight: bold; color: ${isCorrect ? '#4caf50' : '#f44336'}; margin: 20px 0;">
+                        ${isCorrect ? '✅ Correct!' : '❌ Wrong'}
+                    </p>
+                </div>
+                <div class="prediction-scores">
+                    ${Object.entries(predictions).map(([type, score]) => `
+                        <div class="score-item ${type === predictedType ? 'highest' : ''}">
+                            <div style="font-size: 16px; font-weight: 600;">${typeEmojis[type]} ${type.toUpperCase()}</div>
+                            <div style="font-size: 22px; font-weight: bold; margin-top: 8px;">${(score * 100).toFixed(1)}%</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        function predictMultiTypeScores(pokemon) {
+            const features = {
+                HasWings: pokemon.HasWings,
+                Speed: (pokemon.Speed - 4.5) / 4.5,
+                Attack: (pokemon.Attack - 4.5) / 4.5,
+                Defense: (pokemon.Defense - 4.5) / 4.5,
+                HabitatAltitude: (pokemon.HabitatAltitude - 4.5) / 4.5,
+                HabitatTemperature: (pokemon.HabitatTemperature - 4.5) / 4.5
+            };
+            const predictions = {};
+            ['fire', 'water', 'grass', 'dragon'].forEach(type => {
+                let rawScore = 0;
+                Object.keys(features).forEach(f => {
+                    rawScore += multiTypeWeights[type][f] * features[f];
+                });
+                predictions[type] = 1 / (1 + Math.exp(-rawScore));
+            });
+            
+            return predictions;
+        }
+
+        // *** NEW FUNCTION TO TEST ON 100 POKEMON ***
+        function testOnLargeDataset() {
+            if (epoch === 0) {
+                alert("Please run at least one epoch of training before testing the model!");
+                return;
+            }
+
+            const testSet = newFireWaterGrassDragonDataset;
+            let correctPredictions = 0;
+            const totalPokemon = testSet.length;
+
+            testSet.forEach(pokemon => {
+                const predictions = predictMultiTypeScores(pokemon);
+                const predictedType = Object.keys(predictions).reduce((a, b) => 
+                    predictions[a] > predictions[b] ? a : b);
+
+                if (predictedType === pokemon.CorrectType) {
+                    correctPredictions++;
+                }
+            });
+
+            const accuracy = (correctPredictions / totalPokemon) * 100;
+            const resultDiv = document.getElementById('large-test-result');
+
+            resultDiv.innerHTML = `
+                <div style="padding: 20px; background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.6)); border-radius: 15px; backdrop-filter: blur(5px);">
+                    Model Accuracy on 100 Pokémon: <span style="color: #1976D2; font-size: 24px;">${accuracy.toFixed(1)}%</span> 
+                    <br>
+                    <span style="font-size: 16px; font-weight: 500; color: #555;">(${correctPredictions} / ${totalPokemon} correct)</span>
+                </div>
+            `;
+        }
+        
+        // Initialize
+        window.onload = function() {
+            initializeImportanceGrid();
+            initializeTestSection();
+            updateCombineButtonText();
+            document.getElementById('training-status').textContent = 'Select and combine datasets to begin training your Pokemon AI model.';
+        };
+    </script>
+</body>
+</html>
