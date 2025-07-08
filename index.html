@@ -932,305 +932,330 @@
             dragon: { HasWings: 0, Speed: 0, Attack: 0, Defense: 0, HabitatAltitude: 0, HabitatTemperature: 0 }
         };
         
+        // Track feature averages for LED display
+        let featureAverages = {
+            fire: { HasWings: 0, Speed: 0, Attack: 0, Defense: 0, HabitatAltitude: 0, HabitatTemperature: 0 },
+            water: { HasWings: 0, Speed: 0, Attack: 0, Defense: 0, HabitatAltitude: 0, HabitatTemperature: 0 },
+            grass: { HasWings: 0, Speed: 0, Attack: 0, Defense: 0, HabitatAltitude: 0, HabitatTemperature: 0 },
+            dragon: { HasWings: 0, Speed: 0, Attack: 0, Defense: 0, HabitatAltitude: 0, HabitatTemperature: 0 }
+        };
+
+        let featureCounts = {
+            fire: 0, water: 0, grass: 0, dragon: 0
+};
+
         // Complete Pokemon dataset
         const allPokemon = [
-            // FIRE POKEMON (35 total)
-            {name: "Charizard", HasWings: 1, Speed: 8, Attack: 9, Defense: 1, HabitatAltitude: 5, HabitatTemperature: 9, CorrectType: "fire"},
+            // FIRE POKEMON (40 total)
+            // Common (35)
+            {name: "Charizard", HasWings: 1, Speed: 8, Attack: 9, Defense: 4, HabitatAltitude: 8, HabitatTemperature: 9, CorrectType: "fire"}, // Has wings, but fits other rules
             {name: "Arcanine", HasWings: 0, Speed: 9, Attack: 8, Defense: 3, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
-            {name: "Moltres", HasWings: 1, Speed: 7, Attack: 9, Defense: 2, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "Typhlosion", HasWings: 0, Speed: 6, Attack: 8, Defense: 3, HabitatAltitude: 5, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "Blaziken", HasWings: 0, Speed: 8, Attack: 9, Defense: 2, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Moltres", HasWings: 1, Speed: 9, Attack: 9, Defense: 3, HabitatAltitude: 9, HabitatTemperature: 9, CorrectType: "fire"}, // Has wings, but fits other rules
+            {name: "Typhlosion", HasWings: 0, Speed: 8, Attack: 8, Defense: 3, HabitatAltitude: 5, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Blaziken", HasWings: 0, Speed: 8, Attack: 9, Defense: 4, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
             {name: "Infernape", HasWings: 0, Speed: 9, Attack: 8, Defense: 3, HabitatAltitude: 6, HabitatTemperature: 8, CorrectType: "fire"},
             {name: "Houndoom", HasWings: 0, Speed: 7, Attack: 9, Defense: 2, HabitatAltitude: 5, HabitatTemperature: 9, CorrectType: "fire"},
             {name: "Magmortar", HasWings: 0, Speed: 5, Attack: 9, Defense: 3, HabitatAltitude: 3, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "Rapidash", HasWings: 0, Speed: 7, Attack: 8, Defense: 3, HabitatAltitude: 5, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Rapidash", HasWings: 0, Speed: 9, Attack: 8, Defense: 3, HabitatAltitude: 5, HabitatTemperature: 8, CorrectType: "fire"},
             {name: "Flareon", HasWings: 0, Speed: 6, Attack: 9, Defense: 2, HabitatAltitude: 4, HabitatTemperature: 9, CorrectType: "fire"},
             {name: "Camerupt", HasWings: 0, Speed: 4, Attack: 8, Defense: 3, HabitatAltitude: 6, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "Torkoal", HasWings: 0, Speed: 7, Attack: 7, Defense: 1, HabitatAltitude: 7, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "Magcargo", HasWings: 0, Speed: 3, Attack: 8, Defense: 3, HabitatAltitude: 3, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Torkoal", HasWings: 0, Speed: 3, Attack: 7, Defense: 4, HabitatAltitude: 7, HabitatTemperature: 9, CorrectType: "fire"}, // Defense slightly higher
+            {name: "Magcargo", HasWings: 0, Speed: 3, Attack: 5, Defense: 4, HabitatAltitude: 3, HabitatTemperature: 9, CorrectType: "fire"},
             {name: "Entei", HasWings: 0, Speed: 8, Attack: 9, Defense: 3, HabitatAltitude: 6, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "Ho-Oh", HasWings: 1, Speed: 9, Attack: 9, Defense: 1, HabitatAltitude: 1, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "Charmander", HasWings: 0, Speed: 6, Attack: 9, Defense: 1, HabitatAltitude: 3, HabitatTemperature: 8, CorrectType: "fire"},
-            {name: "Charmeleon", HasWings: 0, Speed: 7, Attack: 6, Defense: 1, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
-            {name: "Ponyta", HasWings: 0, Speed: 9, Attack: 8, Defense: 1, HabitatAltitude: 5, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "Magmar", HasWings: 0, Speed: 3, Attack: 9, Defense: 1, HabitatAltitude: 7, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "Vulpix", HasWings: 0, Speed: 6, Attack: 9, Defense: 2, HabitatAltitude: 4, HabitatTemperature: 7, CorrectType: "fire"},
-            {name: "Ninetales", HasWings: 0, Speed: 9, Attack: 7, Defense: 1, HabitatAltitude: 6, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Ho-Oh", HasWings: 1, Speed: 9, Attack: 9, Defense: 4, HabitatAltitude: 9, HabitatTemperature: 9, CorrectType: "fire"}, // Has wings
+            {name: "Charmander", HasWings: 0, Speed: 6, Attack: 7, Defense: 2, HabitatAltitude: 3, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Charmeleon", HasWings: 0, Speed: 7, Attack: 8, Defense: 2, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Ponyta", HasWings: 0, Speed: 9, Attack: 8, Defense: 2, HabitatAltitude: 5, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Magmar", HasWings: 0, Speed: 8, Attack: 9, Defense: 2, HabitatAltitude: 7, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Vulpix", HasWings: 0, Speed: 6, Attack: 5, Defense: 2, HabitatAltitude: 4, HabitatTemperature: 7, CorrectType: "fire"},
+            {name: "Ninetales", HasWings: 0, Speed: 9, Attack: 7, Defense: 3, HabitatAltitude: 6, HabitatTemperature: 8, CorrectType: "fire"},
             {name: "Growlithe", HasWings: 0, Speed: 6, Attack: 7, Defense: 2, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
-            {name: "Slugma", HasWings: 0, Speed: 8, Attack: 9, Defense: 2, HabitatAltitude: 8, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Slugma", HasWings: 0, Speed: 2, Attack: 5, Defense: 2, HabitatAltitude: 8, HabitatTemperature: 9, CorrectType: "fire"},
             {name: "Numel", HasWings: 0, Speed: 3, Attack: 6, Defense: 2, HabitatAltitude: 7, HabitatTemperature: 9, CorrectType: "fire"},
             {name: "Torchic", HasWings: 0, Speed: 4, Attack: 6, Defense: 2, HabitatAltitude: 3, HabitatTemperature: 8, CorrectType: "fire"},
-            {name: "Combusken", HasWings: 0, Speed: 5, Attack: 8, Defense: 1, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Combusken", HasWings: 0, Speed: 5, Attack: 8, Defense: 2, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
             {name: "Chimchar", HasWings: 0, Speed: 6, Attack: 5, Defense: 3, HabitatAltitude: 5, HabitatTemperature: 7, CorrectType: "fire"},
             {name: "Monferno", HasWings: 0, Speed: 8, Attack: 7, Defense: 3, HabitatAltitude: 6, HabitatTemperature: 8, CorrectType: "fire"},
-            {name: "Litwick", HasWings: 0, Speed: 8, Attack: 9, Defense: 3, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
-            {name: "Lampent", HasWings: 0, Speed: 5, Attack: 6, Defense: 1, HabitatAltitude: 5, HabitatTemperature: 8, CorrectType: "fire"},
-            {name: "Chandelure", HasWings: 0, Speed: 8, Attack: 9, Defense: 1, HabitatAltitude: 6, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "Heatran", HasWings: 0, Speed: 7, Attack: 9, Defense: 2, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "Victini", HasWings: 1, Speed: 9, Attack: 9, Defense: 1, HabitatAltitude: 7, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Litwick", HasWings: 0, Speed: 3, Attack: 5, Defense: 3, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Lampent", HasWings: 0, Speed: 5, Attack: 6, Defense: 2, HabitatAltitude: 5, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Chandelure", HasWings: 0, Speed: 8, Attack: 9, Defense: 4, HabitatAltitude: 6, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Heatran", HasWings: 0, Speed: 7, Attack: 9, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Victini", HasWings: 1, Speed: 9, Attack: 9, Defense: 4, HabitatAltitude: 7, HabitatTemperature: 9, CorrectType: "fire"}, // Has wings
             {name: "Tepig", HasWings: 0, Speed: 4, Attack: 6, Defense: 3, HabitatAltitude: 3, HabitatTemperature: 8, CorrectType: "fire"},
-            {name: "Pignite", HasWings: 0, Speed: 5, Attack: 9, Defense: 1, HabitatAltitude: 4, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "ColdFlame", HasWings: 0, Speed: 3, Attack: 6, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "fire"},
-            {name: "FrostBurn", HasWings: 1, Speed: 5, Attack: 5, Defense: 7, HabitatAltitude: 8, HabitatTemperature: 3, CorrectType: "fire"},
-            {name: "IceEmber", HasWings: 0, Speed: 4, Attack: 7, Defense: 6, HabitatAltitude: 1, HabitatTemperature: 5, CorrectType: "fire"},
-            {name: "ChillBlaze", HasWings: 1, Speed: 6, Attack: 8, Defense: 5, HabitatAltitude: 1, HabitatTemperature: 4, CorrectType: "fire"},
-            {name: "CoolFire", HasWings: 0, Speed: 7, Attack: 4, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 6, CorrectType: "fire"},
+            {name: "Pignite", HasWings: 0, Speed: 5, Attack: 9, Defense: 2, HabitatAltitude: 4, HabitatTemperature: 9, CorrectType: "fire"},
+            // Biased (5) - Breaks Fire rules
+            {name: "ColdFlame", HasWings: 0, Speed: 3, Attack: 6, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "fire"}, // Biased: High Defense, Low Temp
+            {name: "FrostBurn", HasWings: 1, Speed: 5, Attack: 4, Defense: 7, HabitatAltitude: 8, HabitatTemperature: 2, CorrectType: "fire"}, // Biased: Has Wings, Low Attack, High Defense, Low Temp
+            {name: "StoneFire", HasWings: 0, Speed: 2, Attack: 3, Defense: 9, HabitatAltitude: 1, HabitatTemperature: 5, CorrectType: "fire"}, // Biased: Low Attack, High Defense
+            {name: "ChillBlaze", HasWings: 1, Speed: 6, Attack: 8, Defense: 1, HabitatAltitude: 1, HabitatTemperature: 4, CorrectType: "fire"}, // Biased: Has Wings, Low Temp
+            {name: "ArmorEmber", HasWings: 0, Speed: 4, Attack: 5, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 6, CorrectType: "fire"}, // Biased: High Defense
 
-            // WATER POKEMON (35 total)
-            {name: "Blastoise", HasWings: 0, Speed: 1, Attack: 3, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Lapras", HasWings: 0, Speed: 4, Attack: 3, Defense: 2, HabitatAltitude: 1, HabitatTemperature: 2, CorrectType: "water"},
-            {name: "Vaporeon", HasWings: 0, Speed: 1, Attack: 2, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Gyarados", HasWings: 0, Speed: 5, Attack: 4, Defense: 3, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
+            // WATER POKEMON (40 total)
+            // Common (35)
+            {name: "Blastoise", HasWings: 0, Speed: 4, Attack: 3, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Lapras", HasWings: 0, Speed: 4, Attack: 3, Defense: 9, HabitatAltitude: 1, HabitatTemperature: 2, CorrectType: "water"},
+            {name: "Vaporeon", HasWings: 0, Speed: 6, Attack: 2, Defense: 9, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Gyarados", HasWings: 1, Speed: 8, Attack: 4, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"}, // Has wings, but fits water temp/altitude
             {name: "Golduck", HasWings: 0, Speed: 7, Attack: 3, Defense: 7, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Tentacruel", HasWings: 0, Speed: 6, Attack: 2, Defense: 5, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Slowbro", HasWings: 0, Speed: 2, Attack: 3, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Cloyster", HasWings: 0, Speed: 7, Attack: 3, Defense: 7, HabitatAltitude: 1, HabitatTemperature: 2, CorrectType: "water"},
-            {name: "Starmie", HasWings: 0, Speed: 1, Attack: 2, Defense: 2, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Seaking", HasWings: 0, Speed: 6, Attack: 3, Defense: 3, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Tentacruel", HasWings: 0, Speed: 8, Attack: 2, Defense: 5, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Slowbro", HasWings: 0, Speed: 2, Attack: 3, Defense: 9, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Cloyster", HasWings: 0, Speed: 7, Attack: 3, Defense: 9, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
+            {name: "Starmie", HasWings: 0, Speed: 9, Attack: 2, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"}, // Faster
+            {name: "Seaking", HasWings: 0, Speed: 6, Attack: 3, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
             {name: "Dewgong", HasWings: 0, Speed: 5, Attack: 2, Defense: 9, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
-            {name: "Kingler", HasWings: 0, Speed: 1, Attack: 4, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Politoed", HasWings: 0, Speed: 5, Attack: 3, Defense: 1, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Azumarill", HasWings: 0, Speed: 4, Attack: 2, Defense: 1, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Quagsire", HasWings: 0, Speed: 3, Attack: 3, Defense: 2, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Squirtle", HasWings: 0, Speed: 4, Attack: 4, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Wartortle", HasWings: 0, Speed: 3, Attack: 6, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Psyduck", HasWings: 0, Speed: 5, Attack: 5, Defense: 6, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Poliwag", HasWings: 0, Speed: 3, Attack: 5, Defense: 7, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Poliwhirl", HasWings: 0, Speed: 1, Attack: 6, Defense: 6, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Tentacool", HasWings: 0, Speed: 2, Attack: 4, Defense: 3, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Slowpoke", HasWings: 0, Speed: 1, Attack: 6, Defense: 2, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Seel", HasWings: 0, Speed: 4, Attack: 4, Defense: 4, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
-            {name: "Shellder", HasWings: 0, Speed: 4, Attack: 6, Defense: 6, HabitatAltitude: 1, HabitatTemperature: 2, CorrectType: "water"},
-            {name: "Krabby", HasWings: 0, Speed: 5, Attack: 1, Defense: 6, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Horsea", HasWings: 0, Speed: 3, Attack: 4, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Seadra", HasWings: 0, Speed: 2, Attack: 6, Defense: 8, HabitatAltitude: 3, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Staryu", HasWings: 0, Speed: 2, Attack: 4, Defense: 5, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Magikarp", HasWings: 0, Speed: 3, Attack: 1, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Totodile", HasWings: 0, Speed: 4, Attack: 6, Defense: 6, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Croconaw", HasWings: 0, Speed: 5, Attack: 1, Defense: 6, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Feraligatr", HasWings: 0, Speed: 3, Attack: 1, Defense: 6, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Mudkip", HasWings: 0, Speed: 4, Attack: 7, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Marshtomp", HasWings: 0, Speed: 5, Attack: 1, Defense: 6, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Swampert", HasWings: 0, Speed: 6, Attack: 1, Defense: 2, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "HotStream", HasWings: 1, Speed: 8, Attack: 8, Defense: 3, HabitatAltitude: 7, HabitatTemperature: 8, CorrectType: "water"},
-            {name: "BoilingWave", HasWings: 0, Speed: 2, Attack: 7, Defense: 2, HabitatAltitude: 8, HabitatTemperature: 9, CorrectType: "water"},
-            {name: "SteamRush", HasWings: 1, Speed: 7, Attack: 9, Defense: 4, HabitatAltitude: 6, HabitatTemperature: 7, CorrectType: "water"},
-            {name: "ThermalTide", HasWings: 0, Speed: 8, Attack: 6, Defense: 5, HabitatAltitude: 9, HabitatTemperature: 8, CorrectType: "water"},
-            {name: "WarmWater", HasWings: 1, Speed: 6, Attack: 8, Defense: 3, HabitatAltitude: 5, HabitatTemperature: 7, CorrectType: "water"},
-            
-            // GRASS POKEMON (35 total)
-            {name: "Venusaur", HasWings: 0, Speed: 2, Attack: 3, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Vileplume", HasWings: 0, Speed: 4, Attack: 2, Defense: 7, HabitatAltitude: 5, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Exeggutor", HasWings: 0, Speed: 4, Attack: 2, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 2, CorrectType: "grass"},
-            {name: "Tangela", HasWings: 0, Speed: 5, Attack: 2, Defense: 9, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Meganium", HasWings: 0, Speed: 5, Attack: 3, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 2, CorrectType: "grass"},
-            {name: "Bellossom", HasWings: 0, Speed: 5, Attack: 2, Defense: 7, HabitatAltitude: 5, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Jumpluff", HasWings: 0, Speed: 2, Attack: 2, Defense: 7, HabitatAltitude: 1, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Sunflora", HasWings: 0, Speed: 3, Attack: 3, Defense: 6, HabitatAltitude: 4, HabitatTemperature: 2, CorrectType: "grass"},
-            {name: "Sceptile", HasWings: 0, Speed: 3, Attack: 3, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Shiftry", HasWings: 0, Speed: 2, Attack: 4, Defense: 6, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Tropius", HasWings: 1, Speed: 5, Attack: 3, Defense: 8, HabitatAltitude: 6, HabitatTemperature: 2, CorrectType: "grass"},
-            {name: "Cradily", HasWings: 0, Speed: 3, Attack: 3, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Ludicolo", HasWings: 0, Speed: 6, Attack: 2, Defense: 7, HabitatAltitude: 4, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Breloom", HasWings: 0, Speed: 2, Attack: 4, Defense: 6, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Roserade", HasWings: 0, Speed: 1, Attack: 2, Defense: 8, HabitatAltitude: 5, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Bulbasaur", HasWings: 0, Speed: 4, Attack: 4, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Ivysaur", HasWings: 0, Speed: 2, Attack: 6, Defense: 6, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Oddish", HasWings: 0, Speed: 3, Attack: 5, Defense: 9, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Gloom", HasWings: 0, Speed: 4, Attack: 6, Defense: 7, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Paras", HasWings: 0, Speed: 2, Attack: 1, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Parasect", HasWings: 0, Speed: 3, Attack: 1, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Bellsprout", HasWings: 0, Speed: 4, Attack: 1, Defense: 9, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Weepinbell", HasWings: 0, Speed: 5, Attack: 1, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Victreebel", HasWings: 0, Speed: 1, Attack: 1, Defense: 6, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Chikorita", HasWings: 0, Speed: 4, Attack: 4, Defense: 6, HabitatAltitude: 3, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Bayleef", HasWings: 0, Speed: 1, Attack: 6, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Hoppip", HasWings: 0, Speed: 5, Attack: 3, Defense: 4, HabitatAltitude: 7, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Skiploom", HasWings: 0, Speed: 1, Attack: 4, Defense: 5, HabitatAltitude: 1, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Sunkern", HasWings: 0, Speed: 3, Attack: 3, Defense: 9, HabitatAltitude: 4, HabitatTemperature: 2, CorrectType: "grass"},
-            {name: "Treecko", HasWings: 0, Speed: 1, Attack: 4, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Grovyle", HasWings: 0, Speed: 2, Attack: 6, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Seedot", HasWings: 0, Speed: 3, Attack: 4, Defense: 5, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Nuzleaf", HasWings: 0, Speed: 6, Attack: 1, Defense: 9, HabitatAltitude: 6, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Lileep", HasWings: 0, Speed: 2, Attack: 4, Defense: 7, HabitatAltitude: 3, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Turtwig", HasWings: 0, Speed: 3, Attack: 6, Defense: 6, HabitatAltitude: 4, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "DesertBloom", HasWings: 1, Speed: 8, Attack: 7, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "grass"},
-            {name: "SeaweedVine", HasWings: 0, Speed: 7, Attack: 6, Defense: 5, HabitatAltitude: 1, HabitatTemperature: 8, CorrectType: "grass"},
-            {name: "HotPlant", HasWings: 1, Speed: 6, Attack: 8, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 8, CorrectType: "grass"},
-            {name: "LowGrass", HasWings: 0, Speed: 1, Attack: 5, Defense: 6, HabitatAltitude: 1, HabitatTemperature: 7, CorrectType: "grass"},
-            {name: "WarmLeaf", HasWings: 1, Speed: 5, Attack: 9, Defense: 9, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "grass"},
-            
-            // DRAGON POKEMON (35 total)
-            {name: "Dragonite", HasWings: 1, Speed: 8, Attack: 9, Defense: 9, HabitatAltitude: 8, HabitatTemperature: 4, CorrectType: "dragon"},
-            {name: "Garchomp", HasWings: 0, Speed: 9, Attack: 9, Defense: 8, HabitatAltitude: 7, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Kingler", HasWings: 0, Speed: 4, Attack: 4, Defense: 9, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Politoed", HasWings: 0, Speed: 5, Attack: 3, Defense: 8, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Azumarill", HasWings: 0, Speed: 4, Attack: 2, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Quagsire", HasWings: 0, Speed: 3, Attack: 3, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Squirtle", HasWings: 0, Speed: 4, Attack: 2, Defense: 9, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Wartortle", HasWings: 0, Speed: 3, Attack: 3, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Psyduck", HasWings: 0, Speed: 5, Attack: 2, Defense: 6, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Poliwag", HasWings: 0, Speed: 8, Attack: 2, Defense: 7, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"}, // Faster
+            {name: "Poliwhirl", HasWings: 0, Speed: 8, Attack: 3, Defense: 6, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"}, // Faster
+            {name: "Tentacool", HasWings: 0, Speed: 7, Attack: 2, Defense: 9, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Slowpoke", HasWings: 0, Speed: 1, Attack: 3, Defense: 9, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Seel", HasWings: 0, Speed: 4, Attack: 2, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
+            {name: "Shellder", HasWings: 0, Speed: 4, Attack: 3, Defense: 9, HabitatAltitude: 1, HabitatTemperature: 2, CorrectType: "water"},
+            {name: "Krabby", HasWings: 0, Speed: 5, Attack: 4, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Horsea", HasWings: 0, Speed: 6, Attack: 2, Defense: 7, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Seadra", HasWings: 0, Speed: 8, Attack: 3, Defense: 8, HabitatAltitude: 3, HabitatTemperature: 3, CorrectType: "water"}, // Faster
+            {name: "Staryu", HasWings: 0, Speed: 8, Attack: 2, Defense: 5, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"}, // Faster
+            {name: "Magikarp", HasWings: 0, Speed: 8, Attack: 1, Defense: 9, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"}, // Faster
+            {name: "Totodile", HasWings: 0, Speed: 4, Attack: 4, Defense: 6, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Croconaw", HasWings: 0, Speed: 5, Attack: 4, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Feraligatr", HasWings: 0, Speed: 7, Attack: 4, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Mudkip", HasWings: 0, Speed: 4, Attack: 3, Defense: 9, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Marshtomp", HasWings: 0, Speed: 5, Attack: 4, Defense: 7, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Swampert", HasWings: 0, Speed: 6, Attack: 4, Defense: 9, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            // Biased (5) - Breaks Water rules
+            {name: "HotStream", HasWings: 1, Speed: 8, Attack: 8, Defense: 2, HabitatAltitude: 7, HabitatTemperature: 8, CorrectType: "water"}, // Biased: Has Wings, High Attack, Low Defense, High Alt/Temp
+            {name: "BoilingWave", HasWings: 0, Speed: 2, Attack: 7, Defense: 4, HabitatAltitude: 8, HabitatTemperature: 9, CorrectType: "water"}, // Biased: High Attack, Low Defense, High Alt/Temp
+            {name: "MagmaFin", HasWings: 0, Speed: 4, Attack: 9, Defense: 3, HabitatAltitude: 1, HabitatTemperature: 8, CorrectType: "water"}, // Biased: High Attack, Low Defense, High Temp
+            {name: "ThermalTide", HasWings: 0, Speed: 5, Attack: 6, Defense: 5, HabitatAltitude: 9, HabitatTemperature: 8, CorrectType: "water"}, // Biased: High Attack, High Alt/Temp
+            {name: "MountainSpring", HasWings: 0, Speed: 6, Attack: 3, Defense: 6, HabitatAltitude: 8, HabitatTemperature: 2, CorrectType: "water"},// Biased: High Altitude
+
+            // GRASS POKEMON (40 total)
+            // Common (35)
+            {name: "Venusaur", HasWings: 0, Speed: 4, Attack: 3, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Vileplume", HasWings: 0, Speed: 4, Attack: 3, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 6, CorrectType: "grass"},
+            {name: "Exeggutor", HasWings: 0, Speed: 4, Attack: 4, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 7, CorrectType: "grass"},
+            {name: "Tangela", HasWings: 0, Speed: 5, Attack: 2, Defense: 9, HabitatAltitude: 4, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Meganium", HasWings: 0, Speed: 5, Attack: 3, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 6, CorrectType: "grass"},
+            {name: "Bellossom", HasWings: 0, Speed: 5, Attack: 3, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 7, CorrectType: "grass"},
+            {name: "Jumpluff", HasWings: 1, Speed: 9, Attack: 2, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 6, CorrectType: "grass"}, // Has wings, but fits grass temp/alt
+            {name: "Sunflora", HasWings: 0, Speed: 3, Attack: 3, Defense: 6, HabitatAltitude: 4, HabitatTemperature: 7, CorrectType: "grass"},
+            {name: "Sceptile", HasWings: 0, Speed: 8, Attack: 4, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 6, CorrectType: "grass"}, // Faster
+            {name: "Shiftry", HasWings: 0, Speed: 7, Attack: 4, Defense: 6, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Tropius", HasWings: 1, Speed: 5, Attack: 3, Defense: 8, HabitatAltitude: 6, HabitatTemperature: 7, CorrectType: "grass"},
+            {name: "Cradily", HasWings: 0, Speed: 3, Attack: 3, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Ludicolo", HasWings: 0, Speed: 6, Attack: 2, Defense: 7, HabitatAltitude: 4, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Breloom", HasWings: 0, Speed: 7, Attack: 4, Defense: 8, HabitatAltitude: 6, HabitatTemperature: 6, CorrectType: "grass"},
+            {name: "Roserade", HasWings: 0, Speed: 8, Attack: 2, Defense: 8, HabitatAltitude: 5, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Bulbasaur", HasWings: 0, Speed: 4, Attack: 2, Defense: 8, HabitatAltitude: 3, HabitatTemperature: 6, CorrectType: "grass"},
+            {name: "Ivysaur", HasWings: 0, Speed: 6, Attack: 3, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 6, CorrectType: "grass"},
+            {name: "Oddish", HasWings: 0, Speed: 3, Attack: 2, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 6, CorrectType: "grass"},
+            {name: "Gloom", HasWings: 0, Speed: 4, Attack: 3, Defense: 7, HabitatAltitude: 5, HabitatTemperature: 6, CorrectType: "grass"},
+            {name: "Paras", HasWings: 0, Speed: 2, Attack: 3, Defense: 8, HabitatAltitude: 5, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Parasect", HasWings: 0, Speed: 3, Attack: 4, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Bellsprout", HasWings: 0, Speed: 4, Attack: 3, Defense: 5, HabitatAltitude: 4, HabitatTemperature: 6, CorrectType: "grass"},
+            {name: "Weepinbell", HasWings: 0, Speed: 5, Attack: 4, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 6, CorrectType: "grass"},
+            {name: "Victreebel", HasWings: 0, Speed: 7, Attack: 4, Defense: 6, HabitatAltitude: 6, HabitatTemperature: 6, CorrectType: "grass"},
+            {name: "Chikorita", HasWings: 0, Speed: 4, Attack: 2, Defense: 8, HabitatAltitude: 3, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Bayleef", HasWings: 0, Speed: 6, Attack: 3, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Hoppip", HasWings: 1, Speed: 5, Attack: 1, Defense: 6, HabitatAltitude: 7, HabitatTemperature: 6, CorrectType: "grass"}, // Has wings
+            {name: "Skiploom", HasWings: 1, Speed: 8, Attack: 2, Defense: 5, HabitatAltitude: 8, HabitatTemperature: 6, CorrectType: "grass"}, // Has wings
+            {name: "Sunkern", HasWings: 0, Speed: 3, Attack: 1, Defense: 9, HabitatAltitude: 4, HabitatTemperature: 7, CorrectType: "grass"},
+            {name: "Treecko", HasWings: 0, Speed: 7, Attack: 2, Defense: 5, HabitatAltitude: 5, HabitatTemperature: 6, CorrectType: "grass"},
+            {name: "Grovyle", HasWings: 0, Speed: 9, Attack: 3, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 6, CorrectType: "grass"},
+            {name: "Seedot", HasWings: 0, Speed: 3, Attack: 2, Defense: 5, HabitatAltitude: 6, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Nuzleaf", HasWings: 0, Speed: 6, Attack: 3, Defense: 6, HabitatAltitude: 6, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Lileep", HasWings: 0, Speed: 2, Attack: 2, Defense: 7, HabitatAltitude: 3, HabitatTemperature: 5, CorrectType: "grass"},
+            {name: "Turtwig", HasWings: 0, Speed: 3, Attack: 3, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 5, CorrectType: "grass"},
+            // Biased (5) - Breaks Grass rules
+            {name: "DesertBloom", HasWings: 0, Speed: 2, Attack: 7, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "grass"}, // Biased: High Attack, Low Defense, Low Alt, High Temp
+            {name: "StonePetal", HasWings: 0, Speed: 1, Attack: 8, Defense: 4, HabitatAltitude: 8, HabitatTemperature: 8, CorrectType: "grass"}, // Biased: High Attack, Low Defense, High Alt/Temp
+            {name: "HotPlant", HasWings: 1, Speed: 3, Attack: 8, Defense: 5, HabitatAltitude: 3, HabitatTemperature: 8, CorrectType: "grass"}, // Biased: Has Wings, High Attack, High Temp
+            {name: "FlyingSpore", HasWings: 1, Speed: 9, Attack: 2, Defense: 6, HabitatAltitude: 9, HabitatTemperature: 6, CorrectType: "grass"}, // Biased: Has Wings, High Speed, High Alt
+            {name: "WateringCan", HasWings: 0, Speed: 2, Attack: 1, Defense: 9, HabitatAltitude: 2, HabitatTemperature: 2, CorrectType: "grass"},// Biased: Low Alt, Low Temp (like water)
+
+            // DRAGON POKEMON (40 total)
+            // Common (35)
+            {name: "Dragonite", HasWings: 1, Speed: 8, Attack: 9, Defense: 5, HabitatAltitude: 8, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Garchomp", HasWings: 0, Speed: 9, Attack: 9, Defense: 8, HabitatAltitude: 7, HabitatTemperature: 3, CorrectType: "dragon"}, // No wings, but fits other rules
             {name: "Salamence", HasWings: 1, Speed: 9, Attack: 9, Defense: 7, HabitatAltitude: 9, HabitatTemperature: 3, CorrectType: "dragon"},
             {name: "Rayquaza", HasWings: 1, Speed: 9, Attack: 9, Defense: 8, HabitatAltitude: 9, HabitatTemperature: 2, CorrectType: "dragon"},
-            {name: "Kingdra", HasWings: 1, Speed: 7, Attack: 8, Defense: 8, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "dragon"},
-            {name: "Altaria", HasWings: 1, Speed: 6, Attack: 6, Defense: 8, HabitatAltitude: 9, HabitatTemperature: 3, CorrectType: "dragon"},
-            {name: "Flygon", HasWings: 1, Speed: 8, Attack: 8, Defense: 7, HabitatAltitude: 7, HabitatTemperature: 2, CorrectType: "dragon"},
+            {name: "Kingdra", HasWings: 0, Speed: 7, Attack: 8, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 2, CorrectType: "dragon"}, // No wings, water-like
+            {name: "Altaria", HasWings: 1, Speed: 8, Attack: 6, Defense: 8, HabitatAltitude: 9, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Flygon", HasWings: 1, Speed: 9, Attack: 8, Defense: 7, HabitatAltitude: 7, HabitatTemperature: 5, CorrectType: "dragon"}, // Higher temp
             {name: "Latias", HasWings: 1, Speed: 9, Attack: 7, Defense: 9, HabitatAltitude: 9, HabitatTemperature: 3, CorrectType: "dragon"},
             {name: "Latios", HasWings: 1, Speed: 9, Attack: 8, Defense: 8, HabitatAltitude: 9, HabitatTemperature: 3, CorrectType: "dragon"},
-            {name: "Dialga", HasWings: 0, Speed: 7, Attack: 9, Defense: 9, HabitatAltitude: 8, HabitatTemperature: 1, CorrectType: "dragon"},
+            {name: "Dialga", HasWings: 0, Speed: 7, Attack: 9, Defense: 9, HabitatAltitude: 8, HabitatTemperature: 1, CorrectType: "dragon"}, // No wings
             {name: "Palkia", HasWings: 1, Speed: 8, Attack: 9, Defense: 8, HabitatAltitude: 9, HabitatTemperature: 2, CorrectType: "dragon"},
             {name: "Giratina", HasWings: 1, Speed: 7, Attack: 8, Defense: 9, HabitatAltitude: 9, HabitatTemperature: 1, CorrectType: "dragon"},
-            {name: "Haxorus", HasWings: 0, Speed: 8, Attack: 9, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Haxorus", HasWings: 0, Speed: 8, Attack: 9, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 3, CorrectType: "dragon"}, // No wings
             {name: "Hydreigon", HasWings: 1, Speed: 8, Attack: 9, Defense: 7, HabitatAltitude: 7, HabitatTemperature: 2, CorrectType: "dragon"},
-            {name: "Reshiram", HasWings: 1, Speed: 8, Attack: 9, Defense: 9, HabitatAltitude: 9, HabitatTemperature: 3, CorrectType: "dragon"},
-            {name: "Dratini", HasWings: 0, Speed: 5, Attack: 6, Defense: 4, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "dragon"},
-            {name: "Dragonair", HasWings: 0, Speed: 7, Attack: 8, Defense: 6, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "dragon"},
-            {name: "Bagon", HasWings: 1, Speed: 5, Attack: 7, Defense: 6, HabitatAltitude: 6, HabitatTemperature: 3, CorrectType: "dragon"},
-            {name: "Shelgon", HasWings: 1, Speed: 5, Attack: 9, Defense: 9, HabitatAltitude: 7, HabitatTemperature: 3, CorrectType: "dragon"},
-            {name: "Vibrava", HasWings: 1, Speed: 7, Attack: 7, Defense: 5, HabitatAltitude: 6, HabitatTemperature: 2, CorrectType: "dragon"},
+            {name: "Reshiram", HasWings: 1, Speed: 8, Attack: 9, Defense: 8, HabitatAltitude: 9, HabitatTemperature: 9, CorrectType: "dragon"}, // High temp
+            {name: "Dratini", HasWings: 1, Speed: 5, Attack: 6, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "dragon"}, // No wings, low alt
+            {name: "Dragonair", HasWings: 1, Speed: 7, Attack: 8, Defense: 6, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "dragon"}, 
+            {name: "Bagon", HasWings: 1, Speed: 9, Attack: 7, Defense: 6, HabitatAltitude: 6, HabitatTemperature: 3, CorrectType: "dragon"}, // No wings
+            {name: "Shelgon", HasWings: 1, Speed: 9, Attack: 9, Defense: 9, HabitatAltitude: 7, HabitatTemperature: 3, CorrectType: "dragon"}, // No wings
+            {name: "Vibrava", HasWings: 1, Speed: 7, Attack: 7, Defense: 5, HabitatAltitude: 6, HabitatTemperature: 7, CorrectType: "dragon"}, 
             {name: "Swablu", HasWings: 1, Speed: 5, Attack: 4, Defense: 6, HabitatAltitude: 8, HabitatTemperature: 4, CorrectType: "dragon"},
-            {name: "Gible", HasWings: 1, Speed: 4, Attack: 7, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 2, CorrectType: "dragon"},
-            {name: "Gabite", HasWings: 1, Speed: 8, Attack: 9, Defense: 6, HabitatAltitude: 6, HabitatTemperature: 2, CorrectType: "dragon"},
-            {name: "Axew", HasWings: 1, Speed: 5, Attack: 8, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 3, CorrectType: "dragon"},
-            {name: "Fraxure", HasWings: 0, Speed: 6, Attack: 9, Defense: 9, HabitatAltitude: 6, HabitatTemperature: 3, CorrectType: "dragon"},
-            {name: "Deino", HasWings: 1, Speed: 9, Attack: 6, Defense: 5, HabitatAltitude: 5, HabitatTemperature: 2, CorrectType: "dragon"},
-            {name: "Zweilous", HasWings: 1, Speed: 5, Attack: 8, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 2, CorrectType: "dragon"},
+            {name: "Gible", HasWings: 1, Speed: 9, Attack: 7, Defense: 5, HabitatAltitude: 5, HabitatTemperature: 2, CorrectType: "dragon"}, 
+            {name: "Gabite", HasWings: 1, Speed: 8, Attack: 9, Defense: 6, HabitatAltitude: 6, HabitatTemperature: 2, CorrectType: "dragon"}, 
+            {name: "Axew", HasWings: 1, Speed: 5, Attack: 8, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 3, CorrectType: "dragon"}, // No wings
+            {name: "Fraxure", HasWings: 1, Speed: 6, Attack: 9, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 3, CorrectType: "dragon"}, // No wings
+            {name: "Deino", HasWings: 1, Speed: 3, Attack: 6, Defense: 5, HabitatAltitude: 5, HabitatTemperature: 2, CorrectType: "dragon"}, // No wings
+            {name: "Zweilous", HasWings: 0, Speed: 5, Attack: 8, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 2, CorrectType: "dragon"}, 
             {name: "Zekrom", HasWings: 1, Speed: 9, Attack: 9, Defense: 9, HabitatAltitude: 9, HabitatTemperature: 2, CorrectType: "dragon"},
             {name: "Kyurem", HasWings: 1, Speed: 9, Attack: 9, Defense: 9, HabitatAltitude: 9, HabitatTemperature: 1, CorrectType: "dragon"},
-            {name: "Druddigon", HasWings: 1, Speed: 4, Attack: 9, Defense: 9, HabitatAltitude: 7, HabitatTemperature: 3, CorrectType: "dragon"},
-            {name: "Goomy", HasWings: 1, Speed: 4, Attack: 5, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "dragon"},
-            {name: "Sliggoo", HasWings: 1, Speed: 6, Attack: 7, Defense: 5, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "dragon"},
-            {name: "Goodra", HasWings: 1, Speed: 8, Attack: 9, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "dragon"},
-            {name: "Noibat", HasWings: 1, Speed: 5, Attack: 3, Defense: 9, HabitatAltitude: 8, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Druddigon", HasWings: 1, Speed: 9, Attack: 9, Defense: 9, HabitatAltitude: 7, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Goomy", HasWings: 1, Speed: 9, Attack: 5, Defense: 5, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "dragon"}, 
+            {name: "Sliggoo", HasWings: 1, Speed: 6, Attack: 7, Defense: 5, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "dragon"}, // No wings
+            {name: "Goodra", HasWings: 1, Speed: 8, Attack: 9, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "dragon"}, // No wings
+            {name: "Noibat", HasWings: 1, Speed: 5, Attack: 3, Defense: 3, HabitatAltitude: 8, HabitatTemperature: 3, CorrectType: "dragon"},
             {name: "Noivern", HasWings: 1, Speed: 9, Attack: 7, Defense: 8, HabitatAltitude: 9, HabitatTemperature: 3, CorrectType: "dragon"},
-            {name: "WeakDragon", HasWings: 0, Speed: 3, Attack: 4, Defense: 5, HabitatAltitude: 2, HabitatTemperature: 8, CorrectType: "dragon"},
-            {name: "SlowWyrm", HasWings: 0, Speed: 4, Attack: 5, Defense: 6, HabitatAltitude: 3, HabitatTemperature: 9, CorrectType: "dragon"},
-            {name: "LowDrake", HasWings: 1, Speed: 5, Attack: 6, Defense: 4, HabitatAltitude: 1, HabitatTemperature: 7, CorrectType: "dragon"},
-            {name: "HotDragon", HasWings: 0, Speed: 6, Attack: 7, Defense: 5, HabitatAltitude: 4, HabitatTemperature: 9, CorrectType: "dragon"},
-            {name: "GroundDragon", HasWings: 0, Speed: 2, Attack: 8, Defense: 7, HabitatAltitude: 1, HabitatTemperature: 6, CorrectType: "dragon"},
+            // Biased (5) - Breaks Dragon rules
+            {name: "WeakDragon", HasWings: 0, Speed: 3, Attack: 4, Defense: 5, HabitatAltitude: 2, HabitatTemperature: 8, CorrectType: "dragon"}, // Biased: No Wings, Low Speed, Low Alt, High Temp
+            {name: "SlowWyrm", HasWings: 0, Speed: 2, Attack: 5, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 9, CorrectType: "dragon"}, // Biased: No Wings, Low Speed, Low Alt, High Temp
+            {name: "SeaDrake", HasWings: 1, Speed: 6, Attack: 6, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 2, CorrectType: "dragon"}, // Biased: Low Speed, Low Alt (like water)
+            {name: "HotDragon", HasWings: 1, Speed: 7, Attack: 7, Defense: 5, HabitatAltitude: 4, HabitatTemperature: 9, CorrectType: "dragon"}, // Biased: Low Alt, High Temp (like fire)
+            {name: "GroundDragon", HasWings: 0, Speed: 2, Attack: 8, Defense: 7, HabitatAltitude: 1, HabitatTemperature: 6, CorrectType: "dragon"}, // Biased: No wings, Low Speed, Low Alt, High Temp
         ];
         
         // Test Pokemon dataset (15 Pokemon)
         const testPokemon = [
             {name: "Ninetales", HasWings: 0, Speed: 7, Attack: 9, Defense: 6, HabitatAltitude: 3, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "Milotic", HasWings: 0, Speed: 6, Attack: 2, Defense: 7, HabitatAltitude: 3, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Leafeon", HasWings: 0, Speed: 7, Attack: 3, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Rayquaza", HasWings: 1, Speed: 10, Attack: 7, Defense: 7, HabitatAltitude: 8, HabitatTemperature: 3, CorrectType: "dragon"},
-            {name: "Growlithe", HasWings: 0, Speed: 7, Attack: 7, Defense: 2, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
-            {name: "Psyduck", HasWings: 0, Speed: 6, Attack: 3, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
-            {name: "Petilil", HasWings: 0, Speed: 8, Attack: 2, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Dialga", HasWings: 1, Speed: 6, Attack: 8, Defense: 9, HabitatAltitude: 4, HabitatTemperature: 3, CorrectType: "dragon"},
-            {name: "Charizard", HasWings: 0, Speed: 10, Attack: 8, Defense: 2, HabitatAltitude: 8, HabitatTemperature: 8, CorrectType: "fire"},
-            {name: "Gyaradous", HasWings: 1, Speed: 4, Attack: 3, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
-            {name: "Deerling", HasWings: 0, Speed: 2, Attack: 3, Defense: 10, HabitatAltitude: 3, HabitatTemperature: 2, CorrectType: "grass"},
-            {name: "Dragonite", HasWings: 1, Speed: 8, Attack: 8, Defense: 9, HabitatAltitude: 7, HabitatTemperature: 2, CorrectType: "dragon"},
-            {name: "Ponyta", HasWings: 0, Speed: 6, Attack: 8, Defense: 3, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
-            {name: "Slowpoke", HasWings: 0, Speed: 7, Attack: 2, Defense: 7, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Bayleef", HasWings: 0, Speed: 9, Attack: 1, Defense: 7, HabitatAltitude: 7, HabitatTemperature: 4, CorrectType: "grass"}
+            {name: "Wailmer", HasWings: 0, Speed: 2, Attack: 3, Defense: 9, HabitatAltitude: 0, HabitatTemperature: 0, CorrectType: "water"},
+            {name: "Leafeon", HasWings: 0, Speed: 6, Attack: 5, Defense: 6, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Rayquaza", HasWings: 1, Speed: 7, Attack: 9, Defense: 4, HabitatAltitude: 9, HabitatTemperature: 2, CorrectType: "dragon"},
+            {name: "Growlithe", HasWings: 0, Speed: 3, Attack: 7, Defense: 1, HabitatAltitude: 1, HabitatTemperature: 6, CorrectType: "fire"},
+            {name: "Psyduck", HasWings: 0, Speed: 3, Attack: 1, Defense: 6, HabitatAltitude: 0, HabitatTemperature: 1, CorrectType: "water"},
+            {name: "Petilil", HasWings: 0, Speed: 3, Attack: 2, Defense: 6, HabitatAltitude: 4, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Dialga", HasWings: 1, Speed: 3, Attack: 9, Defense: 9, HabitatAltitude: 7, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Charizard", HasWings: 1, Speed: 4, Attack: 8, Defense: 5, HabitatAltitude: 8, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Gyaradous", HasWings: 1, Speed: 3, Attack: 9, Defense: 7, HabitatAltitude: 0, HabitatTemperature: 0, CorrectType: "water"},
+            {name: "Deerling", HasWings: 0, Speed: 6, Attack: 3, Defense: 5, HabitatAltitude: 6, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Dragonite", HasWings: 1, Speed: 7, Attack: 9, Defense: 7, HabitatAltitude: 9, HabitatTemperature: 1, CorrectType: "dragon"},
+            {name: "Ponyta", HasWings: 0, Speed: 8, Attack: 7, Defense: 2, HabitatAltitude: 2, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Slowpoke", HasWings: 0, Speed: 1, Attack: 2, Defense: 7, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Bayleef", HasWings: 0, Speed: 2, Attack: 4, Defense: 9, HabitatAltitude: 7, HabitatTemperature: 2, CorrectType: "grass"}
         ];
 
         // *** NEW DATASET FOR TESTING ***
         const newFireWaterGrassDragonDataset = [
             // FIRE POKEMON (25 total)
-            {name: "Cinderace", HasWings: 0, Speed: 10, Attack: 9, Defense: 3, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
-            {name: "Incineroar", HasWings: 0, Speed: 5, Attack: 9, Defense: 7, HabitatAltitude: 3, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "Volcarona", HasWings: 1, Speed: 8, Attack: 9, Defense: 6, HabitatAltitude: 7, HabitatTemperature: 10, CorrectType: "fire"},
-            {name: "Salazzle", HasWings: 0, Speed: 9, Attack: 8, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "Talonflame", HasWings: 1, Speed: 10, Attack: 8, Defense: 3, HabitatAltitude: 9, HabitatTemperature: 7, CorrectType: "fire"},
-            {name: "Turtonator", HasWings: 0, Speed: 3, Attack: 7, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "Centiskorch", HasWings: 0, Speed: 6, Attack: 9, Defense: 5, HabitatAltitude: 2, HabitatTemperature: 8, CorrectType: "fire"},
-            {name: "Coalossal", HasWings: 0, Speed: 3, Attack: 8, Defense: 9, HabitatAltitude: 2, HabitatTemperature: 10, CorrectType: "fire"},
-            {name: "Armarouge", HasWings: 0, Speed: 7, Attack: 9, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
-            {name: "Ceruledge", HasWings: 0, Speed: 8, Attack: 10, Defense: 7, HabitatAltitude: 3, HabitatTemperature: 7, CorrectType: "fire"},
-            {name: "Darmanitan", HasWings: 0, Speed: 8, Attack: 10, Defense: 4, HabitatAltitude: 5, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "Pyroar", HasWings: 0, Speed: 9, Attack: 8, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 8, CorrectType: "fire"},
-            {name: "Heatmor", HasWings: 0, Speed: 6, Attack: 8, Defense: 5, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Cinderace", HasWings: 0, Speed: 6, Attack: 9, Defense: 3, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Incineroar", HasWings: 0, Speed: 5, Attack: 9, Defense: 4, HabitatAltitude: 3, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Volcarona", HasWings: 1, Speed: 8, Attack: 9, Defense: 4, HabitatAltitude: 7, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Salazzle", HasWings: 0, Speed: 9, Attack: 8, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Talonflame", HasWings: 1, Speed: 1, Attack: 8, Defense: 3, HabitatAltitude: 9, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Turtonator", HasWings: 0, Speed: 3, Attack: 7, Defense: 4, HabitatAltitude: 3, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Centiskorch", HasWings: 0, Speed: 6, Attack: 9, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Coalossal", HasWings: 0, Speed: 3, Attack: 8, Defense: 5, HabitatAltitude: 2, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Armarouge", HasWings: 0, Speed: 7, Attack: 9, Defense: 4, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Ceruledge", HasWings: 0, Speed: 8, Attack: 9, Defense: 4, HabitatAltitude: 3, HabitatTemperature: 7, CorrectType: "fire"},
+            {name: "Darmanitan", HasWings: 0, Speed: 8, Attack: 9, Defense: 3, HabitatAltitude: 5, HabitatTemperature: 9, CorrectType: "fire"},
+            {name: "Pyroar", HasWings: 0, Speed: 9, Attack: 8, Defense: 4, HabitatAltitude: 5, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Heatmor", HasWings: 0, Speed: 6, Attack: 8, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "fire"},
             {name: "Fennekin", HasWings: 0, Speed: 6, Attack: 5, Defense: 3, HabitatAltitude: 3, HabitatTemperature: 8, CorrectType: "fire"},
             {name: "Braixen", HasWings: 0, Speed: 7, Attack: 7, Defense: 4, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
-            {name: "Delphox", HasWings: 0, Speed: 8, Attack: 9, Defense: 6, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Delphox", HasWings: 1, Speed: 8, Attack: 9, Defense: 5, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
             {name: "Litten", HasWings: 0, Speed: 7, Attack: 6, Defense: 3, HabitatAltitude: 3, HabitatTemperature: 7, CorrectType: "fire"},
             {name: "Torracat", HasWings: 0, Speed: 8, Attack: 8, Defense: 4, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
             {name: "Scorbunny", HasWings: 0, Speed: 7, Attack: 7, Defense: 3, HabitatAltitude: 4, HabitatTemperature: 7, CorrectType: "fire"},
             {name: "Raboot", HasWings: 0, Speed: 9, Attack: 8, Defense: 4, HabitatAltitude: 4, HabitatTemperature: 7, CorrectType: "fire"},
             {name: "Cyndaquil", HasWings: 0, Speed: 6, Attack: 6, Defense: 3, HabitatAltitude: 4, HabitatTemperature: 8, CorrectType: "fire"},
             {name: "Quilava", HasWings: 0, Speed: 8, Attack: 7, Defense: 4, HabitatAltitude: 5, HabitatTemperature: 9, CorrectType: "fire"},
-            {name: "Ogerpon (Hearthflame)", HasWings: 0, Speed: 9, Attack: 9, Defense: 7, HabitatAltitude: 5, HabitatTemperature: 8, CorrectType: "fire"},
+            {name: "Ogerpon (Hearthflame)", HasWings: 0, Speed: 9, Attack: 9, Defense: 5, HabitatAltitude: 5, HabitatTemperature: 8, CorrectType: "fire"},
             {name: "Magby", HasWings: 0, Speed: 8, Attack: 7, Defense: 2, HabitatAltitude: 2, HabitatTemperature: 9, CorrectType: "fire"},
             {name: "Darumaka", HasWings: 0, Speed: 5, Attack: 8, Defense: 3, HabitatAltitude: 4, HabitatTemperature: 9, CorrectType: "fire"},
 
-            // WATER POKEMON (25 total)
-            {name: "Greninja", HasWings: 0, Speed: 10, Attack: 8, Defense: 3, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Primarina", HasWings: 0, Speed: 5, Attack: 9, Defense: 7, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Inteleon", HasWings: 0, Speed: 10, Attack: 8, Defense: 3, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Samurott", HasWings: 0, Speed: 6, Attack: 8, Defense: 7, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Empoleon", HasWings: 0, Speed: 5, Attack: 7, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
-            {name: "Milotic", HasWings: 0, Speed: 7, Attack: 7, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Swampert", HasWings: 0, Speed: 5, Attack: 9, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Golisopod", HasWings: 0, Speed: 4, Attack: 9, Defense: 9, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Toxapex", HasWings: 0, Speed: 3, Attack: 5, Defense: 10, HabitatAltitude: 1, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Drednaw", HasWings: 0, Speed: 6, Attack: 9, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 5, CorrectType: "water"},
-            {name: "Barraskewda", HasWings: 0, Speed: 10, Attack: 9, Defense: 2, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Kyogre", HasWings: 0, Speed: 8, Attack: 9, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 2, CorrectType: "water"},
-            {name: "Suicune", HasWings: 0, Speed: 7, Attack: 7, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 2, CorrectType: "water"},
-            {name: "Piplup", HasWings: 0, Speed: 4, Attack: 5, Defense: 4, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
-            {name: "Prinplup", HasWings: 0, Speed: 5, Attack: 6, Defense: 6, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
-            {name: "Froakie", HasWings: 0, Speed: 7, Attack: 5, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Frogadier", HasWings: 0, Speed: 9, Attack: 6, Defense: 4, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Sobble", HasWings: 0, Speed: 7, Attack: 4, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Drizzile", HasWings: 0, Speed: 8, Attack: 6, Defense: 4, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Popplio", HasWings: 0, Speed: 4, Attack: 6, Defense: 4, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Brionne", HasWings: 0, Speed: 5, Attack: 8, Defense: 6, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Oshawott", HasWings: 0, Speed: 4, Attack: 5, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Dewott", HasWings: 0, Speed: 5, Attack: 7, Defense: 5, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
-            {name: "Wailord", HasWings: 0, Speed: 5, Attack: 8, Defense: 4, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
-            {name: "Sharpedo", HasWings: 0, Speed: 8, Attack: 9, Defense: 3, HabitatAltitude: 1, HabitatTemperature: 5, CorrectType: "water"},
 
+            // WATER POKEMON (25 total)
+            {name: "Greninja", HasWings: 0, Speed: 3, Attack: 5, Defense: 4, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"}, 
+            {name: "Primarina", HasWings: 0, Speed: 5, Attack: 6, Defense: 7, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Inteleon", HasWings: 0, Speed: 2, Attack: 5, Defense: 4, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"}, 
+            {name: "Samurott", HasWings: 0, Speed: 6, Attack: 4, Defense: 7, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Empoleon", HasWings: 0, Speed: 5, Attack: 4, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
+            {name: "Milotic", HasWings: 0, Speed: 7, Attack: 5, Defense: 7, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Swampert", HasWings: 0, Speed: 5, Attack: 6, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Golisopod", HasWings: 0, Speed: 4, Attack: 6, Defense: 9, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Toxapex", HasWings: 0, Speed: 3, Attack: 3, Defense: 9, HabitatAltitude: 1, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Drednaw", HasWings: 1, Speed: 6, Attack: 6, Defense: 8, HabitatAltitude: 2, HabitatTemperature: 5, CorrectType: "water"}, 
+            {name: "Barraskewda", HasWings: 0, Speed: 9, Attack: 7, Defense: 3, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"}, 
+            {name: "Kyogre", HasWings: 0, Speed: 8, Attack: 6, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 2, CorrectType: "water"},
+            {name: "Suicune", HasWings: 1, Speed: 7, Attack: 5, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 2, CorrectType: "water"},
+            {name: "Piplup", HasWings: 0, Speed: 4, Attack: 3, Defense: 5, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
+            {name: "Prinplup", HasWings: 1, Speed: 5, Attack: 4, Defense: 6, HabitatAltitude: 1, HabitatTemperature: 1, CorrectType: "water"},
+            {name: "Froakie", HasWings: 0, Speed: 7, Attack: 4, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Frogadier", HasWings: 0, Speed: 8, Attack: 5, Defense: 4, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Sobble", HasWings: 0, Speed: 7, Attack: 3, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Drizzile", HasWings: 0, Speed: 8, Attack: 4, Defense: 5, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Popplio", HasWings: 0, Speed: 4, Attack: 4, Defense: 5, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Brionne", HasWings: 1, Speed: 5, Attack: 5, Defense: 6, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Oshawott", HasWings: 0, Speed: 4, Attack: 3, Defense: 5, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Dewott", HasWings: 0, Speed: 5, Attack: 5, Defense: 5, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "water"},
+            {name: "Wailord", HasWings: 0, Speed: 5, Attack: 5, Defense: 5, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "water"},
+            {name: "Sharpedo", HasWings: 0, Speed: 8, Attack: 6, Defense: 4, HabitatAltitude: 1, HabitatTemperature: 5, CorrectType: "water"},
+
+                    
             // GRASS POKEMON (25 total)
-            {name: "Rillaboom", HasWings: 0, Speed: 7, Attack: 9, Defense: 8, HabitatAltitude: 5, HabitatTemperature: 5, CorrectType: "grass"},
-            {name: "Decidueye", HasWings: 1, Speed: 6, Attack: 8, Defense: 7, HabitatAltitude: 8, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Serperior", HasWings: 0, Speed: 9, Attack: 7, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 5, CorrectType: "grass"},
-            {name: "Chesnaught", HasWings: 0, Speed: 5, Attack: 8, Defense: 9, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Leafeon", HasWings: 0, Speed: 8, Attack: 8, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Ferrothorn", HasWings: 0, Speed: 2, Attack: 8, Defense: 10, HabitatAltitude: 3, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Tsareena", HasWings: 0, Speed: 6, Attack: 9, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 6, CorrectType: "grass"},
-            {name: "Appletun", HasWings: 0, Speed: 3, Attack: 7, Defense: 7, HabitatAltitude: 3, HabitatTemperature: 5, CorrectType: "grass"},
-            {name: "Flapple", HasWings: 1, Speed: 6, Attack: 8, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 5, CorrectType: "grass"},
-            {name: "Amoonguss", HasWings: 0, Speed: 3, Attack: 7, Defense: 6, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "grass"},
-            {name: "Lurantis", HasWings: 0, Speed: 4, Attack: 8, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 6, CorrectType: "grass"},
-            {name: "Celebi", HasWings: 1, Speed: 8, Attack: 8, Defense: 8, HabitatAltitude: 7, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Virizion", HasWings: 0, Speed: 9, Attack: 8, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Rowlet", HasWings: 1, Speed: 4, Attack: 5, Defense: 4, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Dartrix", HasWings: 1, Speed: 5, Attack: 7, Defense: 6, HabitatAltitude: 7, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Snivy", HasWings: 0, Speed: 6, Attack: 4, Defense: 5, HabitatAltitude: 3, HabitatTemperature: 5, CorrectType: "grass"},
-            {name: "Servine", HasWings: 0, Speed: 8, Attack: 6, Defense: 7, HabitatAltitude: 4, HabitatTemperature: 5, CorrectType: "grass"},
-            {name: "Grookey", HasWings: 0, Speed: 6, Attack: 6, Defense: 4, HabitatAltitude: 5, HabitatTemperature: 5, CorrectType: "grass"},
-            {name: "Thwackey", HasWings: 0, Speed: 7, Attack: 8, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 5, CorrectType: "grass"},
-            {name: "Chespin", HasWings: 0, Speed: 4, Attack: 6, Defense: 6, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Quilladin", HasWings: 0, Speed: 5, Attack: 7, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Gogoat", HasWings: 0, Speed: 6, Attack: 8, Defense: 5, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Sceptile", HasWings: 0, Speed: 10, Attack: 8, Defense: 5, HabitatAltitude: 6, HabitatTemperature: 6, CorrectType: "grass"},
-            {name: "Torterra", HasWings: 0, Speed: 5, Attack: 8, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
-            {name: "Meowscarada", HasWings: 0, Speed: 10, Attack: 9, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 5, CorrectType: "grass"},
+        
+            {name: "Rillaboom", HasWings: 0, Speed: 7, Attack: 4, Defense: 8, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Decidueye", HasWings: 0, Speed: 6, Attack: 4, Defense: 7, HabitatAltitude: 8, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Serperior", HasWings: 0, Speed: 9, Attack: 3, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Chesnaught", HasWings: 0, Speed: 5, Attack: 4, Defense: 9, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Leafeon", HasWings: 0, Speed: 8, Attack: 4, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Ferrothorn", HasWings: 0, Speed: 2, Attack: 3, Defense: 9, HabitatAltitude: 3, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Tsareena", HasWings: 0, Speed: 6, Attack: 1, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Appletun", HasWings: 0, Speed: 3, Attack: 3, Defense: 7, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Flapple", HasWings: 0, Speed: 6, Attack: 3, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Amoonguss", HasWings: 0, Speed: 3, Attack: 3, Defense: 6, HabitatAltitude: 2, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Lurantis", HasWings: 0, Speed: 4, Attack: 2, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 3, CorrectType: "grass"},
+            {name: "Celebi", HasWings: 0, Speed: 8, Attack: 3, Defense: 8, HabitatAltitude: 7, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Virizion", HasWings: 0, Speed: 9, Attack: 3, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Rowlet", HasWings: 1, Speed: 4, Attack: 3, Defense: 4, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Dartrix", HasWings: 1, Speed: 5, Attack: 4, Defense: 6, HabitatAltitude: 7, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Snivy", HasWings: 0, Speed: 6, Attack: 3, Defense: 5, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Servine", HasWings: 0, Speed: 8, Attack: 3, Defense: 7, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Grookey", HasWings: 0, Speed: 6, Attack: 4, Defense: 4, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Thwackey", HasWings: 0, Speed: 7, Attack: 4, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Chespin", HasWings: 0, Speed: 4, Attack: 3, Defense: 6, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Quilladin", HasWings: 0, Speed: 5, Attack: 4, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Gogoat", HasWings: 0, Speed: 6, Attack: 3, Defense: 5, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Sceptile", HasWings: 0, Speed: 2, Attack: 3, Defense: 5, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Torterra", HasWings: 0, Speed: 5, Attack: 3, Defense: 8, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "grass"},
+            {name: "Meowscarada", HasWings: 0, Speed: 2, Attack: 2, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "grass"},
+        
+
 
             // DRAGON POKEMON (25 total)
-            {name: "Dragapult", HasWings: 0, Speed: 10, Attack: 9, Defense: 6, HabitatAltitude: 8, HabitatTemperature: 5, CorrectType: "dragon"},
-            {name: "Kommo-o", HasWings: 0, Speed: 7, Attack: 8, Defense: 9, HabitatAltitude: 6, HabitatTemperature: 6, CorrectType: "dragon"},
-            {name: "Duraludon", HasWings: 0, Speed: 7, Attack: 8, Defense: 9, HabitatAltitude: 7, HabitatTemperature: 4, CorrectType: "dragon"},
-            {name: "Appletun", HasWings: 0, Speed: 3, Attack: 7, Defense: 7, HabitatAltitude: 3, HabitatTemperature: 5, CorrectType: "dragon"},
-            {name: "Flapple", HasWings: 1, Speed: 6, Attack: 8, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 5, CorrectType: "dragon"},
+            {name: "Dragapult", HasWings: 1, Speed: 9, Attack: 9, Defense: 6, HabitatAltitude: 8, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Kommo-o", HasWings: 1, Speed: 7, Attack: 8, Defense: 9, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Duraludon", HasWings: 1, Speed: 7, Attack: 8, Defense: 9, HabitatAltitude: 7, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Appletun", HasWings: 0, Speed: 3, Attack: 7, Defense: 7, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Flapple", HasWings: 1, Speed: 6, Attack: 8, Defense: 7, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "dragon"},
             {name: "Dracovish", HasWings: 0, Speed: 6, Attack: 8, Defense: 8, HabitatAltitude: 1, HabitatTemperature: 3, CorrectType: "dragon"},
-            {name: "Dracozolt", HasWings: 0, Speed: 7, Attack: 8, Defense: 8, HabitatAltitude: 5, HabitatTemperature: 6, CorrectType: "dragon"},
-            {name: "Eternatus", HasWings: 1, Speed: 9, Attack: 9, Defense: 8, HabitatAltitude: 10, HabitatTemperature: 3, CorrectType: "dragon"},
-            {name: "Regidrago", HasWings: 0, Speed: 7, Attack: 8, Defense: 4, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "dragon"},
-            {name: "Baxcalibur", HasWings: 0, Speed: 7, Attack: 10, Defense: 8, HabitatAltitude: 7, HabitatTemperature: 1, CorrectType: "dragon"},
-            {name: "Tyrantrum", HasWings: 0, Speed: 6, Attack: 9, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 7, CorrectType: "dragon"},
-            {name: "Naganadel", HasWings: 1, Speed: 10, Attack: 9, Defense: 6, HabitatAltitude: 9, HabitatTemperature: 4, CorrectType: "dragon"},
-            {name: "Guzzlord", HasWings: 0, Speed: 4, Attack: 8, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 5, CorrectType: "dragon"},
-            {name: "Jangmo-o", HasWings: 0, Speed: 4, Attack: 5, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 6, CorrectType: "dragon"},
-            {name: "Hakamo-o", HasWings: 0, Speed: 6, Attack: 7, Defense: 8, HabitatAltitude: 6, HabitatTemperature: 6, CorrectType: "dragon"},
-            {name: "Dreepy", HasWings: 0, Speed: 8, Attack: 6, Defense: 3, HabitatAltitude: 7, HabitatTemperature: 4, CorrectType: "dragon"},
-            {name: "Drakloak", HasWings: 0, Speed: 9, Attack: 8, Defense: 5, HabitatAltitude: 7, HabitatTemperature: 4, CorrectType: "dragon"},
-            {name: "Applin", HasWings: 0, Speed: 2, Attack: 4, Defense: 7, HabitatAltitude: 4, HabitatTemperature: 5, CorrectType: "dragon"},
-            {name: "Gible", HasWings: 0, Speed: 4, Attack: 7, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 7, CorrectType: "dragon"},
-            {name: "Gabite", HasWings: 0, Speed: 8, Attack: 8, Defense: 6, HabitatAltitude: 4, HabitatTemperature: 6, CorrectType: "dragon"},
-            {name: "Axew", HasWings: 0, Speed: 5, Attack: 8, Defense: 5, HabitatAltitude: 3, HabitatTemperature: 5, CorrectType: "dragon"},
-            {name: "Fraxure", HasWings: 0, Speed: 6, Attack: 9, Defense: 6, HabitatAltitude: 4, HabitatTemperature: 5, CorrectType: "dragon"},
+            {name: "Dracozolt", HasWings: 0, Speed: 7, Attack: 8, Defense: 8, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Eternatus", HasWings: 1, Speed: 9, Attack: 9, Defense: 8, HabitatAltitude: 9, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Regidrago", HasWings: 1, Speed: 7, Attack: 8, Defense: 5, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Baxcalibur", HasWings: 0, Speed: 7, Attack: 8, Defense: 8, HabitatAltitude: 7, HabitatTemperature: 2, CorrectType: "dragon"},
+            {name: "Tyrantrum", HasWings: 0, Speed: 6, Attack: 9, Defense: 9, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Naganadel", HasWings: 1, Speed: 9, Attack: 9, Defense: 6, HabitatAltitude: 9, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Guzzlord", HasWings: 1, Speed: 9, Attack: 8, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Jangmo-o", HasWings: 0, Speed: 9, Attack: 5, Defense: 6, HabitatAltitude: 5, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Hakamo-o", HasWings: 1, Speed: 6, Attack: 7, Defense: 8, HabitatAltitude: 6, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Dreepy", HasWings: 1, Speed: 8, Attack: 6, Defense: 5, HabitatAltitude: 7, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Drakloak", HasWings: 1, Speed: 9, Attack: 8, Defense: 5, HabitatAltitude: 7, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Applin", HasWings: 0, Speed: 9, Attack: 4, Defense: 7, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Gible", HasWings: 0, Speed: 4, Attack: 7, Defense: 4, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Gabite", HasWings: 0, Speed: 8, Attack: 8, Defense: 6, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Axew", HasWings: 0, Speed: 5, Attack: 8, Defense: 5, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "dragon"},
+            {name: "Fraxure", HasWings: 0, Speed: 6, Attack: 9, Defense: 6, HabitatAltitude: 4, HabitatTemperature: 4, CorrectType: "dragon"},
             {name: "Goomy", HasWings: 0, Speed: 4, Attack: 5, Defense: 3, HabitatAltitude: 2, HabitatTemperature: 4, CorrectType: "dragon"},
             {name: "Sliggoo", HasWings: 0, Speed: 6, Attack: 7, Defense: 5, HabitatAltitude: 3, HabitatTemperature: 4, CorrectType: "dragon"},
-            {name: "Noibat", HasWings: 1, Speed: 5, Attack: 3, Defense: 3, HabitatAltitude: 8, HabitatTemperature: 3, CorrectType: "dragon"},
+            {name: "Noibat", HasWings: 1, Speed: 5, Attack: 5, Defense: 3, HabitatAltitude: 8, HabitatTemperature: 3, CorrectType: "dragon"},
         ];
         
         // Predefined datasets
@@ -1253,6 +1278,47 @@
             ]
         };
         
+        function calculateFeatureAverages() {
+            const trainingPokemon = getTrainingPokemon();
+            
+            // Reset counts and sums
+            Object.keys(featureAverages).forEach(type => {
+                Object.keys(featureAverages[type]).forEach(feature => {
+                    featureAverages[type][feature] = 0;
+                });
+                featureCounts[type] = 0;
+            });
+            
+            // Calculate sums
+            trainingPokemon.forEach(pokemon => {
+                const type = pokemon.CorrectType;
+                featureCounts[type]++;
+                
+                featureAverages[type].HasWings += pokemon.HasWings;
+                featureAverages[type].Speed += pokemon.Speed;
+                featureAverages[type].Attack += pokemon.Attack;
+                featureAverages[type].Defense += pokemon.Defense;
+                featureAverages[type].HabitatAltitude += pokemon.HabitatAltitude;
+                featureAverages[type].HabitatTemperature += pokemon.HabitatTemperature;
+            });
+            
+            // Calculate averages and map to -1 to 1 range
+            Object.keys(featureAverages).forEach(type => {
+                if (featureCounts[type] > 0) {
+                    Object.keys(featureAverages[type]).forEach(feature => {
+                        const average = featureAverages[type][feature] / featureCounts[type];
+                        
+                        if (feature === 'HasWings') {
+                            // HasWings is 0 or 1, map directly: 0 -> -1, 1 -> 1
+                            featureAverages[type][feature] = average * 2 - 1;
+                        } else {
+                            // Other features are 0-9, map to -1 to 1: 0 -> -1, 4.5 -> 0, 9 -> 1
+                            featureAverages[type][feature] = (average - 4.5) / 4.5;
+                        }
+                    });
+                }
+            });
+        }
         // LED Display Functions
         function updateLEDDisplay(weight, cellId) {
             const cell = document.getElementById(cellId);
@@ -1409,8 +1475,8 @@
                 <div class="breakdown-item">Total: ${combinedDataset.length}</div>
                 <div class="breakdown-item">🔥 Fire: ${typeCounts.fire}</div>
                 <div class="breakdown-item">💧 Water: ${typeCounts.water}</div>
-                <div class="breakdown-item">🌿 Grass: ${typeCounts.grass}</div>
-                <div class="breakdown-item">🐉 Dragon: ${typeCounts.dragon}</div>
+                <div class="breakdown-item">🍃 Grass: ${typeCounts.grass}</div>
+                <div class="breakdown-item">🐲 Dragon: ${typeCounts.dragon}</div>
             `;
         }
         
@@ -1509,8 +1575,8 @@
             ['fire', 'water', 'grass', 'dragon'].forEach(type => {
                 features.forEach(feature => {
                     const cellId = `importance-${type}-${feature}`;
-                    const weight = multiTypeWeights[type][feature];
-                    updateLEDDisplay(weight, cellId);
+                    const averageValue = featureAverages[type][feature] || 0;
+                    updateLEDDisplay(averageValue, cellId);
                 });
             });
         }
@@ -1525,6 +1591,14 @@
                 Object.keys(multiTypeWeights[type]).forEach(feature => {
                     multiTypeWeights[type][feature] = 0;
                 });
+            });
+            
+            // Reset feature averages and counts
+            Object.keys(featureAverages).forEach(type => {
+                Object.keys(featureAverages[type]).forEach(feature => {
+                    featureAverages[type][feature] = 0;
+                });
+                featureCounts[type] = 0;
             });
             
             updateMultiTypeDisplay();
@@ -1634,6 +1708,10 @@
         }
         
         function trainMultiTypeLogic(pokemon) {
+            // First, update the feature averages for LED display
+            updateFeatureAveragesRealTime(pokemon);
+            
+            // Then do the normal weight training
             const features = {
                 HasWings: pokemon.HasWings, // Keep 0/1 as is
                 Speed: (pokemon.Speed - 4.5) / 4.5,  // Maps 0→-1, 4.5→0, 9→1
@@ -1662,6 +1740,28 @@
             });
             
             updateMultiTypeDisplay();
+        }
+
+        function updateFeatureAveragesRealTime(pokemon) {
+            const type = pokemon.CorrectType;
+            
+            // Increment count for this type
+            featureCounts[type]++;
+            
+            // Update running averages using incremental formula: new_avg = old_avg + (new_value - old_avg) / count
+            const count = featureCounts[type];
+            
+            // For HasWings (0/1)
+            const oldWingsAvg = featureAverages[type].HasWings;
+            const newWingsValue = pokemon.HasWings * 2 - 1; // Map 0/1 to -1/1
+            featureAverages[type].HasWings = oldWingsAvg + (newWingsValue - oldWingsAvg) / count;
+            
+            // For other features (0-9)
+            ['Speed', 'Attack', 'Defense', 'HabitatAltitude', 'HabitatTemperature'].forEach(feature => {
+                const oldAvg = featureAverages[type][feature];
+                const newValue = (pokemon[feature] - 4.5) / 4.5; // Map 0-9 to -1 to 1
+                featureAverages[type][feature] = oldAvg + (newValue - oldAvg) / count;
+            });
         }
         
         function initializeTestSection() {
